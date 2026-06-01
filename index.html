@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>INVEXA 360° — Ecosistema de Gestión Patrimonial</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    /* ========================================================
+       TOKENS & RESET
+    ======================================================== */
+    :root {
+      --surface:          #041329;
+      --surface-lo:       #0d1c32;
+      --surface-mid:      #112036;
+      --surface-hi:       #1c2a41;
+      --surface-highest:  #27354c;
+      --primary:          #4edea3;
+      --primary-dim:      #2ab882;
+      --primary-glow:     rgba(78, 222, 163, 0.18);
+      --primary-subtle:   rgba(78, 222, 163, 0.08);
+      --on-primary:       #003824;
+      --on-surface:       #d6e3ff;
+      --on-surface-var:   #8ba0b5;
+      --outline:          #3c4a42;
+      --outline-var:      #233554;
+      --error:            #ffb4ab;
+      --error-dim:        rgba(255,180,171,0.12);
+      --warning:          #fb923c;
+      --warning-dim:      rgba(251,146,60,0.12);
+
+      --font-display:     'Syne', sans-serif;
+      --font-mono:        'JetBrains Mono', monospace;
+      --font-body:        'Inter', sans-serif;
+
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-xl: 24px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: var(--surface);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* ========================================================
+       SCROLLBAR
+    ======================================================== */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--surface); }
+    ::-webkit-scrollbar-thumb { background: var(--surface-highest); border-radius: 10px; }
+
+    /* ========================================================
+       UTILITY
+    ======================================================== */
+    .mono { font-family: var(--font-mono); }
+    .label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--on-surface-var);
+    }
+    .label-green { color: var(--primary); }
+    .tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .tag-green { background: var(--primary-subtle); border: 1px solid rgba(78,222,163,0.3); color: var(--primary); }
+    .tag-gray  { background: var(--surface-hi); border: 1px solid var(--outline); color: var(--on-surface-var); }
+    .tag-error { background: var(--error-dim); border: 1px solid rgba(255,180,171,0.3); color: var(--error); }
+    .tag-warn  { background: var(--warning-dim); border: 1px solid rgba(251,146,60,0.3); color: var(--warning); }
+
+    .divider { border: none; border-top: 1px solid var(--outline); }
+    .section { padding: 96px 0; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+    @media (max-width: 768px) { .container { padding: 0 20px; } .section { padding: 64px 0; } }
+
+    /* ========================================================
+       GRID BACKGROUND
+    ======================================================== */
+    .grid-bg {
+      background-image:
+        radial-gradient(ellipse 60% 40% at 10% 20%, rgba(78,222,163,0.05) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 50% at 90% 80%, rgba(78,222,163,0.04) 0%, transparent 60%),
+        radial-gradient(#233554 0.5px, transparent 0.5px);
+      background-size: auto, auto, 28px 28px;
+    }
+
+    /* ========================================================
+       NAV
+    ======================================================== */
+    .nav {
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px; height: 64px;
+      background: rgba(4,19,41,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--outline);
+      transition: border-color 0.3s;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .nav-logo-mark {
+      width: 32px; height: 32px;
+      background: var(--primary-subtle);
+      border: 1px solid rgba(78,222,163,0.4);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 800; font-size: 14px;
+      color: var(--primary);
+    }
+    .nav-brand {
+      font-family: var(--font-display);
+      font-weight: 700; font-size: 15px;
+      letter-spacing: 0.02em;
+      color: var(--primary);
+    }
+    .nav-links { display: flex; gap: 32px; align-items: center; }
+    .nav-link {
+      font-size: 13px; color: var(--on-surface-var);
+      transition: color 0.2s;
+      font-family: var(--font-mono);
+      font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .nav-link:hover { color: var(--on-surface); }
+    .nav-cta {
+      padding: 8px 18px;
+      background: var(--primary);
+      color: var(--on-primary);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .nav-cta:hover { opacity: 0.88; transform: translateY(-1px); }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .nav { padding: 0 20px; }
+    }
+
+    /* ========================================================
+       HERO
+    ======================================================== */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      text-align: center;
+      padding: 120px 40px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 50% 40%, rgba(78,222,163,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 28px;
+    }
+    .hero-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--primary);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.7); }
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(44px, 7vw, 88px);
+      line-height: 1.0;
+      letter-spacing: -0.03em;
+      color: var(--on-surface);
+      margin-bottom: 10px;
+    }
+    .hero-title .accent { color: var(--primary); }
+    .hero-subtitle {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(18px, 2.5vw, 28px);
+      color: var(--on-surface-var);
+      margin-bottom: 28px;
+      letter-spacing: -0.01em;
+    }
+    .hero-desc {
+      max-width: 560px;
+      font-size: 15px;
+      color: var(--on-surface-var);
+      line-height: 1.75;
+      margin-bottom: 48px;
+    }
+    .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-bottom: 80px; }
+    .btn-primary {
+      padding: 14px 32px;
+      background: var(--primary);
+      color: var(--on-primary);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      transition: transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 0 0 0 rgba(78,222,163,0.4);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(78,222,163,0.25);
+    }
+    .btn-outline {
+      padding: 14px 32px;
+      background: transparent;
+      color: var(--on-surface);
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .btn-outline:hover { border-color: var(--primary); background: var(--primary-subtle); }
+
+    /* IGVP Gauge Hero */
+    .hero-gauge {
+      position: relative;
+      display: inline-flex; flex-direction: column; align-items: center;
+    }
+    .hero-gauge svg { filter: drop-shadow(0 0 20px rgba(78,222,163,0.2)); }
+    .hero-gauge-label {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -52%);
+      text-align: center;
+    }
+    .gauge-value {
+      font-family: var(--font-display);
+      font-size: 36px; font-weight: 800;
+      color: var(--on-surface);
+      line-height: 1;
+    }
+    .gauge-status {
+      font-family: var(--font-mono);
+      font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--warning); margin-top: 4px;
+    }
+
+    /* Stats strip */
+    .hero-stats {
+      display: flex; gap: 0;
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: var(--surface-lo);
+    }
+    .hero-stat {
+      padding: 16px 32px;
+      border-right: 1px solid var(--outline);
+      text-align: center;
+    }
+    .hero-stat:last-child { border-right: none; }
+    .hero-stat-value {
+      font-family: var(--font-display);
+      font-size: 26px; font-weight: 800;
+      color: var(--on-surface); line-height: 1;
+      margin-bottom: 4px;
+    }
+    .hero-stat-value.green { color: var(--primary); }
+    .hero-stat-value.warn  { color: var(--warning); }
+    .hero-stat-value.err   { color: var(--error); }
+    .hero-stat-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--on-surface-var); }
+    @media (max-width: 640px) {
+      .hero-stats { flex-direction: column; }
+      .hero-stat { border-right: none; border-bottom: 1px solid var(--outline); }
+      .hero-stat:last-child { border-bottom: none; }
+    }
+
+    /* ========================================================
+       SECTION: PROBLEM (RUTA)
+    ======================================================== */
+    .route-section { background: var(--surface-lo); }
+    .route-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+    @media (max-width: 900px) { .route-grid { grid-template-columns: 1fr; gap: 40px; } }
+    .route-steps { display: flex; flex-direction: column; gap: 0; }
+    .route-step {
+      display: flex; gap: 20px;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--outline);
+      position: relative;
+    }
+    .route-step:last-child { border-bottom: none; }
+    .step-number {
+      font-family: var(--font-mono);
+      font-size: 11px; font-weight: 700;
+      color: var(--primary);
+      width: 28px; flex-shrink: 0;
+      padding-top: 2px;
+    }
+    .step-content h4 {
+      font-family: var(--font-display);
+      font-size: 16px; font-weight: 700;
+      color: var(--on-surface);
+      margin-bottom: 4px;
+    }
+    .step-content p { font-size: 13px; color: var(--on-surface-var); line-height: 1.6; }
+    .step-tag { margin-top: 8px; }
+
+    .route-visual {
+      background: var(--surface-mid);
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+    }
+    .route-visual-title {
+      font-family: var(--font-mono);
+      font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--primary); margin-bottom: 24px;
+    }
+    .igvp-scale { display: flex; flex-direction: column; gap: 10px; }
+    .igvp-row { display: flex; align-items: center; gap: 12px; }
+    .igvp-bar-wrap { flex: 1; height: 8px; background: var(--surface-highest); border-radius: 99px; overflow: hidden; }
+    .igvp-bar { height: 100%; border-radius: 99px; }
+    .igvp-label { font-family: var(--font-mono); font-size: 10px; color: var(--on-surface-var); width: 80px; text-align: right; }
+    .igvp-pct { font-family: var(--font-mono); font-size: 10px; color: var(--on-surface-var); width: 36px; }
+
+    /* ========================================================
+       PROTOCOLS
+    ======================================================== */
+    .protocols-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .protocol-card {
+      background: var(--surface-lo);
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      position: relative; overflow: hidden;
+      transition: border-color 0.25s, transform 0.2s;
+      cursor: default;
+    }
+    .protocol-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--primary); opacity: 0;
+      transition: opacity 0.25s;
+    }
+    .protocol-card:hover { border-color: rgba(78,222,163,0.4); transform: translateY(-3px); }
+    .protocol-card:hover::before { opacity: 1; }
+    .protocol-icon {
+      width: 42px; height: 42px;
+      background: var(--primary-subtle);
+      border: 1px solid rgba(78,222,163,0.2);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px;
+      font-size: 18px;
+    }
+    .protocol-code {
+      font-family: var(--font-mono);
+      font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--primary); margin-bottom: 8px;
+    }
+    .protocol-name {
+      font-family: var(--font-display);
+      font-size: 17px; font-weight: 700;
+      color: var(--on-surface); margin-bottom: 10px;
+    }
+    .protocol-desc { font-size: 13px; color: var(--on-surface-var); line-height: 1.65; }
+    .protocol-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 18px;
+      font-family: var(--font-mono);
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--primary);
+      transition: gap 0.2s;
+    }
+    .protocol-card:hover .protocol-link { gap: 10px; }
+
+    /* ========================================================
+       ACTORS
+    ======================================================== */
+    .actors-section { background: var(--surface-lo); }
+    .actors-table-wrap {
+      background: var(--surface-mid);
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .actors-table-header {
+      padding: 14px 24px;
+      background: var(--surface-hi);
+      border-bottom: 1px solid var(--outline);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .actors-table-header span {
+      font-family: var(--font-mono);
+      font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--primary);
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { border-bottom: 1px solid var(--outline); }
+    th {
+      padding: 12px 20px; text-align: left;
+      font-family: var(--font-mono);
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--on-surface-var);
+    }
+    td {
+      padding: 14px 20px;
+      font-size: 13px; color: var(--on-surface);
+      border-bottom: 1px solid rgba(60,74,66,0.5);
+      vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: var(--surface-highest); }
+    .actor-level {
+      font-family: var(--font-mono);
+      font-size: 10px; font-weight: 700;
+      padding: 3px 8px; border-radius: 4px;
+    }
+    .level-direct { background: rgba(78,222,163,0.1); color: var(--primary); }
+    .level-control { background: rgba(188,198,230,0.1); color: #bcc6e6; }
+    .level-proj { background: rgba(255,180,171,0.08); color: #ffb4ab; }
+
+    /* ========================================================
+       DUALITY PROMO
+    ======================================================== */
+    .duality-section {
+      background: var(--surface);
+      position: relative; overflow: hidden;
+    }
+    .duality-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(78,222,163,0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .duality-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px; align-items: center;
+    }
+    @media (max-width: 900px) { .duality-inner { grid-template-columns: 1fr; gap: 40px; } }
+    .duality-title {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 800;
+      line-height: 1.1; letter-spacing: -0.02em;
+      color: var(--on-surface); margin-bottom: 20px;
+    }
+    .duality-title span { color: var(--primary); }
+    .duality-body { font-size: 14px; color: var(--on-surface-var); line-height: 1.75; margin-bottom: 28px; }
+    .duality-cards { display: flex; flex-direction: column; gap: 12px; }
+    .duality-card {
+      background: var(--surface-mid);
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-md);
+      padding: 18px 22px;
+      display: flex; align-items: flex-start; gap: 16px;
+    }
+    .duality-card-icon {
+      font-size: 20px; width: 36px; flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .duality-card-title { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--on-surface); margin-bottom: 4px; }
+    .duality-card-desc { font-size: 12px; color: var(--on-surface-var); line-height: 1.6; }
+
+    /* ========================================================
+       IGVP VISUALIZATION SECTION
+    ======================================================== */
+    .igvp-section { background: var(--surface-lo); }
+    .igvp-full {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 32px; align-items: stretch;
+    }
+    @media (max-width: 900px) { .igvp-full { grid-template-columns: 1fr; } }
+    .igvp-gauge-card {
+      background: var(--surface-mid);
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .igvp-levels {
+      background: var(--surface-mid);
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .igvp-level-row {
+      display: flex; align-items: center; gap: 20px;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--outline);
+      transition: background 0.2s;
+    }
+    .igvp-level-row:last-child { border-bottom: none; }
+    .igvp-level-row:hover { background: var(--surface-highest); }
+    .igvp-color { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .igvp-level-name {
+      font-family: var(--font-display);
+      font-size: 15px; font-weight: 700;
+      color: var(--on-surface); min-width: 110px;
+    }
+    .igvp-range { font-family: var(--font-mono); font-size: 11px; color: var(--on-surface-var); min-width: 80px; }
+    .igvp-action { font-size: 13px; color: var(--on-surface-var); flex: 1; }
+    .igvp-badge { font-family: var(--font-mono); font-size: 10px; padding: 3px 10px; border-radius: 99px; }
+
+    /* ========================================================
+       LEGAL FRAMEWORK
+    ======================================================== */
+    .legal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .legal-card {
+      background: var(--surface-lo);
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-md);
+      padding: 24px;
+    }
+    .legal-icon { font-size: 24px; margin-bottom: 14px; }
+    .legal-name { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--on-surface); margin-bottom: 8px; }
+    .legal-desc { font-size: 12px; color: var(--on-surface-var); line-height: 1.65; }
+
+    /* ========================================================
+       AUTHOR / CLOSING CTA
+    ======================================================== */
+    .cta-section {
+      background: var(--surface);
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 80% at 50% 100%, rgba(78,222,163,0.07) 0%, transparent 70%);
+    }
+    .cta-eyebrow { margin-bottom: 20px; }
+    .cta-title {
+      font-family: var(--font-display);
+      font-size: clamp(32px, 5vw, 60px);
+      font-weight: 800;
+      line-height: 1.1; letter-spacing: -0.025em;
+      color: var(--on-surface); margin-bottom: 20px;
+    }
+    .cta-title span { color: var(--primary); }
+    .cta-sub { font-size: 15px; color: var(--on-surface-var); max-width: 480px; margin: 0 auto 40px; line-height: 1.7; }
+    .author-block {
+      display: inline-flex; align-items: center; gap: 16px;
+      background: var(--surface-mid);
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-lg);
+      padding: 16px 28px; margin-top: 48px;
+    }
+    .author-avatar {
+      width: 42px; height: 42px;
+      background: var(--primary-subtle);
+      border: 2px solid rgba(78,222,163,0.3);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display); font-weight: 800; font-size: 15px;
+      color: var(--primary);
+    }
+    .author-name { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--on-surface); margin-bottom: 2px; }
+    .author-role { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--on-surface-var); }
+
+    /* ========================================================
+       FOOTER
+    ======================================================== */
+    footer {
+      border-top: 1px solid var(--outline);
+      padding: 32px 40px;
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+      flex-wrap: wrap;
+    }
+    .footer-copy { font-family: var(--font-mono); font-size: 11px; color: var(--on-surface-var); }
+    .footer-seal {
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--primary); display: flex; align-items: center; gap: 6px;
+    }
+
+    /* ========================================================
+       SECTION HEADERS
+    ======================================================== */
+    .section-header { margin-bottom: 56px; }
+    .section-header.center { text-align: center; }
+    .section-eyebrow {
+      font-family: var(--font-mono); font-size: 11px;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--primary); margin-bottom: 12px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-eyebrow.center { justify-content: center; }
+    .section-eyebrow::after {
+      content: ''; flex: 1; height: 1px; background: var(--outline);
+      max-width: 60px;
+    }
+    .section-eyebrow.center::before {
+      content: ''; flex: 1; height: 1px; background: var(--outline);
+      max-width: 60px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 800; line-height: 1.15;
+      letter-spacing: -0.025em;
+      color: var(--on-surface);
+    }
+    .section-title .accent { color: var(--primary); }
+    .section-desc {
+      margin-top: 14px;
+      font-size: 15px; color: var(--on-surface-var);
+      line-height: 1.7; max-width: 560px;
+    }
+    .section-header.center .section-desc { margin: 14px auto 0; }
+
+    /* ========================================================
+       ANIMATE-IN
+    ======================================================== */
+    .fade-up {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+    .stagger-1 { transition-delay: 0.1s; }
+    .stagger-2 { transition-delay: 0.2s; }
+    .stagger-3 { transition-delay: 0.3s; }
+    .stagger-4 { transition-delay: 0.4s; }
+    .stagger-5 { transition-delay: 0.5s; }
+    .stagger-6 { transition-delay: 0.6s; }
+  </style>
+</head>
+<body class="grid-bg">
+
+  <!-- ============================================================ NAV ============================================================ -->
+  <nav class="nav">
+    <div class="nav-logo">
+      <div class="nav-logo-mark">IX</div>
+      <span class="nav-brand">INVEXA 360°</span>
+    </div>
+    <div class="nav-links">
+      <a href="#ruta" class="nav-link">La Ruta</a>
+      <a href="#protocolos" class="nav-link">Protocolos</a>
+      <a href="#actores" class="nav-link">Actores</a>
+      <a href="#legal" class="nav-link">Marco Legal</a>
+      <a href="#plataforma" class="nav-cta">Ver Plataforma</a>
+    </div>
+  </nav>
+
+  <!-- ============================================================ HERO ============================================================ -->
+  <section class="hero">
+
+    <div class="hero-eyebrow fade-up">
+      <div class="hero-dot"></div>
+      <span class="label label-green">Ecosistema Operativo · Caracas, Venezuela</span>
+    </div>
+
+    <h1 class="hero-title fade-up stagger-1">
+      El Resguardo<br><span class="accent">de tu Patrimonio</span>
+    </h1>
+    <p class="hero-subtitle fade-up stagger-2">Gestión Patrimonial Sistémica</p>
+    <p class="hero-desc fade-up stagger-3">
+      Transformamos la propiedad horizontal venezolana de la improvisación a la ingeniería de control científico. INVEXA 360° es el sistema operativo que blinda tu inversión.
+    </p>
+
+    <div class="hero-actions fade-up stagger-4">
+      <a href="#protocolos" class="btn-primary">Explorar Protocolos</a>
+      <a href="#plataforma" class="btn-outline">Ver la Plataforma</a>
+    </div>
+
+    <!-- Stats strip -->
+    <div class="hero-stats fade-up stagger-5">
+      <div class="hero-stat">
+        <div class="hero-stat-value green">7</div>
+        <div class="hero-stat-label">Protocolos Maestros</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">11</div>
+        <div class="hero-stat-label">Actores del Ecosistema</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value warn">45%</div>
+        <div class="hero-stat-label">IGVP Promedio Sector</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value green">100%</div>
+        <div class="hero-stat-label">Trazabilidad Garantizada</div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============================================================ RUTA ============================================================ -->
+  <section class="section route-section" id="ruta">
+    <div class="container">
+      <div class="route-grid">
+
+        <div>
+          <div class="section-header">
+            <div class="section-eyebrow">La Ruta de Corresponsabilidad</div>
+            <h2 class="section-title">Del Voluntarismo a la <span class="accent">Ingeniería</span> de Control</h2>
+            <p class="section-desc">Cinco hitos obligatorios que transforman cualquier condominio en un Activo Contenedor eficiente, transparente e inimpugnable.</p>
+          </div>
+
+          <div class="route-steps">
+            <div class="route-step fade-up">
+              <span class="step-number">01</span>
+              <div class="step-content">
+                <h4>Punto de Partida — Estado Cero</h4>
+                <p>Diagnóstico forense inicial que fija la línea base estructural, financiera y legal del activo.</p>
+                <div class="step-tag"><span class="tag tag-green">CLB</span></div>
+              </div>
+            </div>
+            <div class="route-step fade-up stagger-1">
+              <span class="step-number">02</span>
+              <div class="step-content">
+                <h4>Sistematización Técnica</h4>
+                <p>Adopción del Libro Blanco donde cada decisión y mantenimiento se registra de forma inmutable.</p>
+                <div class="step-tag"><span class="tag tag-green">PSLB</span></div>
+              </div>
+            </div>
+            <div class="route-step fade-up stagger-2">
+              <span class="step-number">03</span>
+              <div class="step-content">
+                <h4>Filtro de Aptitud</h4>
+                <p>Validación de todo prestador de servicio y órgano de gobierno bajo capacidad técnica probada.</p>
+                <div class="step-tag"><span class="tag tag-green">SIVA</span></div>
+              </div>
+            </div>
+            <div class="route-step fade-up stagger-3">
+              <span class="step-number">04</span>
+              <div class="step-content">
+                <h4>Gobernanza Basada en Evidencias</h4>
+                <p>Soberanía de Asamblea fundamentada exclusivamente en bases probatorias técnicas.</p>
+                <div class="step-tag"><span class="tag tag-green">PMGI</span></div>
+              </div>
+            </div>
+            <div class="route-step fade-up stagger-4">
+              <span class="step-number">05</span>
+              <div class="step-content">
+                <h4>Ciclo de Mejora Continua</h4>
+                <p>Retroalimentación Habilitante: cada disconformidad se traduce en formación pedagógica.</p>
+                <div class="step-tag"><span class="tag tag-green">PMFGPC</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visual IGVP mini -->
+        <div class="route-visual fade-up stagger-2">
+          <div class="route-visual-title">Indicador IGVP · Niveles de Vulnerabilidad</div>
+
+          <!-- Gauge SVG -->
+          <div style="display:flex;justify-content:center;margin-bottom:28px;">
+            <div class="hero-gauge">
+              <svg width="180" height="110" viewBox="0 0 180 110">
+                <path d="M 20 95 A 70 70 0 0 1 160 95" fill="none" stroke="#27354c" stroke-width="12" stroke-linecap="round"/>
+                <!-- critical -->
+                <path d="M 20 95 A 70 70 0 0 1 160 95" fill="none" stroke="url(#gaugeFill)" stroke-width="12"
+                      stroke-linecap="round"
+                      stroke-dasharray="220" stroke-dashoffset="110" />
+                <defs>
+                  <linearGradient id="gaugeFill" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#4edea3"/>
+                    <stop offset="50%" stop-color="#fb923c"/>
+                    <stop offset="100%" stop-color="#ff4444"/>
+                  </linearGradient>
+                </defs>
+                <!-- needle -->
+                <line x1="90" y1="95" x2="55" y2="42" stroke="#fb923c" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="90" cy="95" r="5" fill="#fb923c"/>
+                <circle cx="90" cy="95" r="3" fill="#1c2a41"/>
+                <!-- labels -->
+                <text x="16" y="110" fill="#4edea3" font-family="JetBrains Mono, monospace" font-size="9">0%</text>
+                <text x="84" y="22" fill="#8ba0b5" font-family="JetBrains Mono, monospace" font-size="9" text-anchor="middle">50%</text>
+                <text x="158" y="110" fill="#ff4444" font-family="JetBrains Mono, monospace" font-size="9" text-anchor="end">100%</text>
+              </svg>
+              <div class="hero-gauge-label" style="position:static;transform:none;text-align:center;margin-top:-8px;">
+                <div class="gauge-value" style="font-size:28px;">45%</div>
+                <div class="gauge-status">Moderado</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="igvp-scale">
+            <div class="igvp-row">
+              <div class="igvp-label">Controlado</div>
+              <div class="igvp-bar-wrap"><div class="igvp-bar" style="width:25%;background:#4edea3;"></div></div>
+              <div class="igvp-pct" style="color:#4edea3;">0–25%</div>
+            </div>
+            <div class="igvp-row">
+              <div class="igvp-label">Moderado</div>
+              <div class="igvp-bar-wrap"><div class="igvp-bar" style="width:50%;background:#facc15;"></div></div>
+              <div class="igvp-pct" style="color:#facc15;">26–50%</div>
+            </div>
+            <div class="igvp-row">
+              <div class="igvp-label">Avanzado</div>
+              <div class="igvp-bar-wrap"><div class="igvp-bar" style="width:75%;background:#fb923c;"></div></div>
+              <div class="igvp-pct" style="color:#fb923c;">51–75%</div>
+            </div>
+            <div class="igvp-row">
+              <div class="igvp-label">Crítico</div>
+              <div class="igvp-bar-wrap"><div class="igvp-bar" style="width:100%;background:#ff4444;"></div></div>
+              <div class="igvp-pct" style="color:#ff4444;">76–100%</div>
+            </div>
+          </div>
+
+          <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--outline);">
+            <p class="label" style="margin-bottom:8px;">Sello de Idoneidad Patrimonial</p>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:18px;">✦</span>
+              <span style="font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--primary);">INVEXA 360° CERTIFICADO</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ PROTOCOLS ============================================================ -->
+  <section class="section" id="protocolos">
+    <div class="container">
+      <div class="section-header center">
+        <div class="section-eyebrow center">Suite Operativa</div>
+        <h2 class="section-title">Protocolos <span class="accent">Maestros</span> de Acción</h2>
+        <p class="section-desc">Siete protocolos interconectados que conforman la arquitectura de ingeniería de control del ecosistema.</p>
+      </div>
+
+      <div class="protocols-grid">
+
+        <div class="protocol-card fade-up stagger-1">
+          <div class="protocol-icon">🔍</div>
+          <div class="protocol-code">I · CLB</div>
+          <div class="protocol-name">Certificación de Línea Base</div>
+          <p class="protocol-desc">Diagnóstico forense inicial del Estado Cero. Audita las dimensiones legal, administrativa y técnica antes de cualquier inversión.</p>
+          <div class="protocol-link">Ver módulo <span>→</span></div>
+        </div>
+
+        <div class="protocol-card fade-up stagger-2">
+          <div class="protocol-icon">📖</div>
+          <div class="protocol-code">II · PSLB</div>
+          <div class="protocol-name">Libro Blanco Digital</div>
+          <p class="protocol-desc">Registro inmutable de la historia del activo. Caja Negra Patrimonial con plena eficacia legal en arbitraje y litigio.</p>
+          <div class="protocol-link">Ver módulo <span>→</span></div>
+        </div>
+
+        <div class="protocol-card fade-up stagger-3">
+          <div class="protocol-icon">🔐</div>
+          <div class="protocol-code">III · SIVA</div>
+          <div class="protocol-name">Filtro de Aptitud</div>
+          <p class="protocol-desc">Validación técnica y legal de proveedores y órganos de gobierno. Ningún prestador opera sin certificación de capacidad probada.</p>
+          <div class="protocol-link">Ver módulo <span>→</span></div>
+        </div>
+
+        <div class="protocol-card fade-up stagger-1">
+          <div class="protocol-icon">🏛️</div>
+          <div class="protocol-code">IV · PMGI</div>
+          <div class="protocol-name">Gestión Institucional</div>
+          <p class="protocol-desc">Competencias y límites operativos de Asamblea, Junta y Administradora. Resolución Fundamentada: decisiones basadas en evidencia.</p>
+          <div class="protocol-link">Ver módulo <span>→</span></div>
+        </div>
+
+        <div class="protocol-card fade-up stagger-2">
+          <div class="protocol-icon">⚙️</div>
+          <div class="protocol-code">V · PMCO</div>
+          <div class="protocol-name">Control Operativo</div>
+          <p class="protocol-desc">Estandarización de ejecución técnica y mantenimiento de infraestructuras críticas. Ciclo RIV-01 → SIVA → Ejecución → PSLB.</p>
+          <div class="protocol-link">Ver módulo <span>→</span></div>
+        </div>
+
+        <div class="protocol-card fade-up stagger-3">
+          <div class="protocol-icon">🎓</div>
+          <div class="protocol-code">VI · PMFGPC</div>
+          <div class="protocol-name">Formación Patrimonial</div>
+          <p class="protocol-desc">Alfabetización institucional mandatoria. Del "comunero" pasivo al copropietario vigilante del cumplimiento de protocolos.</p>
+          <div class="protocol-link">Ver módulo <span>→</span></div>
+        </div>
+
+        <div class="protocol-card fade-up stagger-1" style="grid-column: span 1;">
+          <div class="protocol-icon">⚖️</div>
+          <div class="protocol-code">VII · PMAGPC</div>
+          <div class="protocol-name">Arbitraje y Gestión de Partes</div>
+          <p class="protocol-desc">Resolución institucional de disputas. Conciliación → Mediación Arbitral → Arbitraje Formal. Todo registrado en el Libro Blanco.</p>
+          <div class="protocol-link">Ver módulo <span>→</span></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ DUALITY ============================================================ -->
+  <section class="section duality-section">
+    <div class="container">
+      <div class="duality-inner">
+        <div>
+          <div class="section-eyebrow" style="margin-bottom:16px;">Regla de Oro</div>
+          <h2 class="duality-title">La <span>Dualidad</span> Probatoria</h2>
+          <p class="duality-body">Ninguna junta o administración puede declarar solvencia si la liquidez se mantiene a costa de no reparar sistemas vitales. Pagar sin Aval Técnico inhabilita cualquier gestión financiera.</p>
+          <a href="#plataforma" class="btn-primary">Ver en la Plataforma</a>
+        </div>
+
+        <div class="duality-cards">
+          <div class="duality-card fade-up">
+            <div class="duality-card-icon">🧾</div>
+            <div>
+              <div class="duality-card-title">Factura Legal SENIAT</div>
+              <div class="duality-card-desc">Todo egreso financiero debe respaldarse con comprobante fiscal válido ante el SENIAT. Requisito indispensable para cualquier movimiento contable.</div>
+            </div>
+          </div>
+          <div class="duality-card fade-up stagger-1">
+            <div class="duality-card-icon">✅</div>
+            <div>
+              <div class="duality-card-title">Aval Técnico Certificado</div>
+              <div class="duality-card-desc">Toda intervención en sistemas vitales requiere certificación SIVA del ejecutor. Sin aval, el gasto carece de validez técnica y es impugnable ante la Asamblea.</div>
+            </div>
+          </div>
+          <div class="duality-card fade-up stagger-2" style="border-color:rgba(78,222,163,0.3);background:var(--primary-subtle);">
+            <div class="duality-card-icon">🛡️</div>
+            <div>
+              <div class="duality-card-title" style="color:var(--primary);">Deuda Técnica = Riesgo Patrimonial</div>
+              <div class="duality-card-desc">Las deficiencias no visibles en el balance financiero representan pasivos reales. El CLB las cuantifica y las integra al IGVP como amenaza medible al valor del activo.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ ACTORES ============================================================ -->
+  <section class="section actors-section" id="actores">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Catálogo Maestro</div>
+        <h2 class="section-title">El Ecosistema de los <span class="accent">11 Actores</span></h2>
+        <p class="section-desc">Cada actor conoce y cumple su rol de riesgo. Los actores 1–7 están sujetos a la Ficha de Vida Inicial para medir su impacto en la seguridad patrimonial.</p>
+      </div>
+
+      <div class="actors-table-wrap fade-up">
+        <div class="actors-table-header">
+          <span>●</span>
+          <span>Registro de Actores · FVI Activo</span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Nivel</th>
+                <th>Actor</th>
+                <th>Función de Resguardo</th>
+                <th>FVI</th>
+                <th>Estatus</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="actor-level level-direct">Directo</span></td>
+                <td><strong>Copropietarios</strong></td>
+                <td>Derechos y deberes sobre áreas comunes y gobernanza</td>
+                <td><span class="tag tag-green">Requerida</span></td>
+                <td><span class="tag tag-green">Vigente</span></td>
+              </tr>
+              <tr>
+                <td><span class="actor-level level-direct">Directo</span></td>
+                <td><strong>Asamblea de Copropietarios</strong></td>
+                <td>Soberanía: deliberación y aprobación basada en evidencia técnica</td>
+                <td><span class="tag tag-green">Requerida</span></td>
+                <td><span class="tag tag-green">Vigente</span></td>
+              </tr>
+              <tr>
+                <td><span class="actor-level level-direct">Directo</span></td>
+                <td><strong>Junta de Condominio</strong></td>
+                <td>Dirección y control: supervisión técnica y validación de emergencia</td>
+                <td><span class="tag tag-green">Requerida</span></td>
+                <td><span class="tag tag-warn">Revisión</span></td>
+              </tr>
+              <tr>
+                <td><span class="actor-level level-direct">Directo</span></td>
+                <td><strong>Administradora</strong></td>
+                <td>Gestión operativa y legal; ejecuta SIVA y PSLB</td>
+                <td><span class="tag tag-green">Requerida</span></td>
+                <td><span class="tag tag-green">Vigente</span></td>
+              </tr>
+              <tr>
+                <td><span class="actor-level level-direct">Directo</span></td>
+                <td><strong>Asociación Civil</strong></td>
+                <td>Personalidad jurídica del condominio ante entes externos</td>
+                <td><span class="tag tag-green">Requerida</span></td>
+                <td><span class="tag tag-green">Vigente</span></td>
+              </tr>
+              <tr>
+                <td><span class="actor-level level-direct">Directo</span></td>
+                <td><strong>Personal Dependiente</strong></td>
+                <td>Operación de sistemas vitales; requiere Aptitud de Resguardo SIVA</td>
+                <td><span class="tag tag-green">Requerida</span></td>
+                <td><span class="tag tag-error">Pendiente</span></td>
+              </tr>
+              <tr>
+                <td><span class="actor-level level-direct">Directo</span></td>
+                <td><strong>Prestadores de Servicio</strong></td>
+                <td>Contratistas y firmas de ingeniería; sujetos a validación SIVA</td>
+                <td><span class="tag tag-green">Requerida</span></td>
+                <td><span class="tag tag-warn">Revisión</span></td>
+              </tr>
+              <tr>
+                <td><span class="actor-level level-control">Control</span></td>
+                <td><strong>Nodo de Ejecución (Actor 8)</strong></td>
+                <td>Validación forense, auditoría y litigio procedimental</td>
+                <td><span class="tag tag-gray">No Aplica</span></td>
+                <td><span class="tag tag-green">Activo</span></td>
+              </tr>
+              <tr>
+                <td><span class="actor-level level-control">Control</span></td>
+                <td><strong>Fiscalización Institucional</strong></td>
+                <td>SENIAT, Alcaldías y entes de regulación fiscal</td>
+                <td><span class="tag tag-gray">No Aplica</span></td>
+                <td><span class="tag tag-gray">Externo</span></td>
+              </tr>
+              <tr>
+                <td><span class="actor-level level-control">Control</span></td>
+                <td><strong>Instancias Judiciales</strong></td>
+                <td>Convalidación legal de actuaciones ante el sistema de justicia</td>
+                <td><span class="tag tag-gray">No Aplica</span></td>
+                <td><span class="tag tag-gray">Externo</span></td>
+              </tr>
+              <tr>
+                <td><span class="actor-level level-proj">Proyección</span></td>
+                <td><strong>Formación Temprana</strong></td>
+                <td>Generación de relevo: sostenibilidad del activo a largo plazo</td>
+                <td><span class="tag tag-gray">Voluntaria</span></td>
+                <td><span class="tag tag-green">Activo</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ PLATFORM PREVIEW ============================================================ -->
+  <section class="section" id="plataforma">
+    <div class="container">
+      <div class="section-header center">
+        <div class="section-eyebrow center">Plataforma Digital</div>
+        <h2 class="section-title">INVEXA 360° <span class="accent">Dashboard</span></h2>
+        <p class="section-desc">Cuatro módulos integrados para la gestión total del activo: visibilidad en tiempo real, trazabilidad histórica y control de proveedores.</p>
+      </div>
+
+      <!-- Module cards -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:40px;">
+
+        <div class="protocol-card fade-up stagger-1" style="text-align:center;">
+          <div style="font-size:32px;margin-bottom:16px;">📊</div>
+          <div class="protocol-code" style="justify-content:center;display:block;">Módulo Principal</div>
+          <div class="protocol-name">Dashboard IGVP</div>
+          <p class="protocol-desc">Indicadores en tiempo real, semáforo de vulnerabilidad, evolución de riesgo y monitoreo de activos críticos.</p>
+        </div>
+
+        <div class="protocol-card fade-up stagger-2" style="text-align:center;">
+          <div style="font-size:32px;margin-bottom:16px;">🔒</div>
+          <div class="protocol-code" style="display:block;">Módulo Auditoría</div>
+          <div class="protocol-name">Certificación CLB</div>
+          <p class="protocol-desc">Registro de Inspección Vital RIV-01, gestión de hallazgos por criticidad y generación de piezas probatorias.</p>
+        </div>
+
+        <div class="protocol-card fade-up stagger-3" style="text-align:center;">
+          <div style="font-size:32px;margin-bottom:16px;">📚</div>
+          <div class="protocol-code" style="display:block;">Módulo PSLB</div>
+          <div class="protocol-name">Libro Blanco Digital</div>
+          <p class="protocol-desc">Timeline inmutable, explorador de documentos, archivo histórico certificado con sello de verificación.</p>
+        </div>
+
+        <div class="protocol-card fade-up stagger-4" style="text-align:center;">
+          <div style="font-size:32px;margin-bottom:16px;">🔍</div>
+          <div class="protocol-code" style="display:block;">Módulo Proveedores</div>
+          <div class="protocol-name">Filtro SIVA</div>
+          <p class="protocol-desc">Directorio de proveedores certificados, análisis multidimensional de aptitud y descarga de certificados PDF.</p>
+        </div>
+
+      </div>
+
+      <!-- Mockup preview bar -->
+      <div class="fade-up" style="background:var(--surface-mid);border:1px solid var(--outline);border-radius:var(--radius-lg);overflow:hidden;">
+        <div style="padding:14px 24px;background:var(--surface-hi);border-bottom:1px solid var(--outline);display:flex;align-items:center;gap:10px;">
+          <div style="width:10px;height:10px;border-radius:50%;background:#ff5f57;"></div>
+          <div style="width:10px;height:10px;border-radius:50%;background:#febc2e;"></div>
+          <div style="width:10px;height:10px;border-radius:50%;background:#28c840;"></div>
+          <span class="label" style="margin-left:12px;">invexa360.app — Dashboard Principal</span>
+        </div>
+        <!-- Simulated dashboard preview -->
+        <div style="padding:28px;display:grid;grid-template-columns:1fr 2fr;gap:20px;min-height:260px;">
+          <!-- Sidebar mock -->
+          <div style="background:var(--surface-lo);border:1px solid var(--outline);border-radius:var(--radius-md);padding:20px;display:flex;flex-direction:column;gap:12px;">
+            <div class="label label-green" style="margin-bottom:4px;">Navegación</div>
+            <div style="background:var(--surface-highest);border-radius:6px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
+              <span style="font-size:14px;">📊</span>
+              <span style="font-family:var(--font-mono);font-size:11px;color:var(--primary);">Dashboard</span>
+            </div>
+            <div style="padding:10px 14px;display:flex;align-items:center;gap:10px;">
+              <span style="font-size:14px;">🔒</span>
+              <span style="font-family:var(--font-mono);font-size:11px;color:var(--on-surface-var);">CLB</span>
+            </div>
+            <div style="padding:10px 14px;display:flex;align-items:center;gap:10px;">
+              <span style="font-size:14px;">📚</span>
+              <span style="font-family:var(--font-mono);font-size:11px;color:var(--on-surface-var);">Libro Blanco</span>
+            </div>
+            <div style="padding:10px 14px;display:flex;align-items:center;gap:10px;">
+              <span style="font-size:14px;">🔍</span>
+              <span style="font-family:var(--font-mono);font-size:11px;color:var(--on-surface-var);">SIVA</span>
+            </div>
+          </div>
+          <!-- Main panel mock -->
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+              <div style="background:var(--surface-lo);border:1px solid var(--outline);border-radius:var(--radius-md);padding:16px;">
+                <div class="label" style="margin-bottom:6px;">IGVP Actual</div>
+                <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--warning);">45%</div>
+                <div class="label" style="color:var(--warning);margin-top:2px;">Moderado</div>
+              </div>
+              <div style="background:var(--surface-lo);border:1px solid var(--outline);border-radius:var(--radius-md);padding:16px;">
+                <div class="label" style="margin-bottom:6px;">Deuda Técnica</div>
+                <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--on-surface);">$12,450</div>
+                <div class="label" style="color:var(--error);margin-top:2px;">+1.2% vs Q3</div>
+              </div>
+              <div style="background:var(--surface-lo);border:1px solid var(--outline);border-radius:var(--radius-md);padding:16px;">
+                <div class="label" style="margin-bottom:6px;">Sistemas Vitales</div>
+                <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--primary);">4/5</div>
+                <div class="label" style="color:var(--primary);margin-top:2px;">Activos</div>
+              </div>
+            </div>
+            <!-- Alert mockup -->
+            <div style="background:var(--surface-lo);border:1px solid var(--outline);border-radius:var(--radius-md);padding:16px;">
+              <div class="label" style="margin-bottom:10px;">Disparadores Activos</div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <div style="padding:10px 14px;background:rgba(255,75,75,0.08);border-left:3px solid var(--error);border-radius:4px;display:flex;justify-content:space-between;align-items:center;">
+                  <span style="font-size:12px;">Elevator Maintenance Overdue — TK-4402</span>
+                  <span class="tag tag-error">Crítico</span>
+                </div>
+                <div style="padding:10px 14px;background:var(--warning-dim);border-left:3px solid var(--warning);border-radius:4px;display:flex;justify-content:space-between;align-items:center;">
+                  <span style="font-size:12px;">Póliza de Seguro de Incendio Vencida — LG-9912</span>
+                  <span class="tag tag-warn">Advertencia</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ LEGAL ============================================================ -->
+  <section class="section actors-section" id="legal">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Marco de Validez</div>
+        <h2 class="section-title">Fundamento <span class="accent">Jurídico</span></h2>
+        <p class="section-desc">Todo instrumento generado bajo INVEXA 360° posee valor probatorio en mediación, arbitraje o instancias judiciales.</p>
+      </div>
+      <div class="legal-grid">
+        <div class="legal-card fade-up stagger-1">
+          <div class="legal-icon">📜</div>
+          <div class="legal-name">Constitución CRBV</div>
+          <p class="legal-desc">Respeto al derecho de propiedad y el deber de preservar el patrimonio colectivo como base de toda actuación.</p>
+        </div>
+        <div class="legal-card fade-up stagger-2">
+          <div class="legal-icon">📗</div>
+          <div class="legal-name">Código Civil Venezolano</div>
+          <p class="legal-desc">Normas sobre comunidad de bienes, responsabilidad civil y gestión de negocios ajenos como sustento operativo.</p>
+        </div>
+        <div class="legal-card fade-up stagger-3">
+          <div class="legal-icon">🏢</div>
+          <div class="legal-name">Ley de Propiedad Horizontal</div>
+          <p class="legal-desc">Deberes y derechos de copropietarios, competencias del administrador y la junta en la preservación de áreas comunes.</p>
+        </div>
+        <div class="legal-card fade-up stagger-4">
+          <div class="legal-icon">⚖️</div>
+          <div class="legal-name">Ley Orgánica de Procedimientos</div>
+          <p class="legal-desc">Aseguramiento de la transparencia y probidad en la gestión de recursos de interés común bajo control institucional.</p>
+        </div>
+      </div>
+      <div style="margin-top:32px;padding:24px;background:var(--surface-mid);border:1px solid rgba(78,222,163,0.2);border-radius:var(--radius-md);" class="fade-up">
+        <div style="display:flex;align-items:flex-start;gap:16px;">
+          <span style="font-size:22px;flex-shrink:0;">🛡️</span>
+          <div>
+            <div style="font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--primary);margin-bottom:6px;">Dualidad Probatoria — Principio Irrenunciable</div>
+            <p style="font-size:13px;color:var(--on-surface-var);line-height:1.7;">Los documentos generados bajo este ecosistema (Certificaciones, Avales Técnicos, Fichas de Vida, Auditorías) poseen valor como medios de prueba en instancias de mediación, arbitraje o judiciales. La omisión deliberada de estos procesos constituye incumplimiento de obligaciones contractuales y fiduciarias.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ CTA ============================================================ -->
+  <section class="section cta-section">
+    <div class="container">
+      <div class="cta-eyebrow">
+        <span class="tag tag-green">✦ Certificación de Idoneidad INVEXA 360°</span>
+      </div>
+      <h2 class="cta-title fade-up">Tu Patrimonio Merece<br><span>Ingeniería de Control</span></h2>
+      <p class="cta-sub fade-up stagger-1">Deja de gestionar por improvisación. Adopta el ecosistema que convierte cada Bolívar administrado en una decisión inimpugnable y trazable.</p>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;" class="fade-up stagger-2">
+        <a href="#protocolos" class="btn-primary">Iniciar Certificación CLB</a>
+        <a href="#ruta" class="btn-outline">Ver la Ruta Completa</a>
+      </div>
+
+      <div class="author-block fade-up stagger-3">
+        <div class="author-avatar">AA</div>
+        <div>
+          <div class="author-name">Arianne A. Adrián Arraiz</div>
+          <div class="author-role">Creadora y Autora del Ecosistema INVEXA 360° · Estratega en Gestión Patrimonial Sistémica</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ FOOTER ============================================================ -->
+  <footer>
+    <span class="footer-copy">© 2024 INVEXA 360° · Derechos Reservados. Propiedad intelectual exclusiva de Arianne A. Adrián Arraiz.</span>
+    <span class="footer-seal">✦ Rigurosidad Técnico-Legal y Convivencia</span>
+  </footer>
+
+  <!-- ============================================================ SCRIPTS ============================================================ -->
+  <script>
+    // Intersection Observer for fade-up animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+    // Nav active link highlight on scroll
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-link');
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(s => {
+        if (window.scrollY >= s.offsetTop - 100) current = s.id;
+      });
+      navLinks.forEach(l => {
+        l.style.color = l.getAttribute('href') === '#' + current
+          ? 'var(--on-surface)' : '';
+      });
+    });
+  </script>
+
+</body>
+</html>
