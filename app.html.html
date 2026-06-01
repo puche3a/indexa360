@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="theme-color" content="#041329"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="INVEXA 360°"/>
+<title>INVEXA 360°</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:#041329;--bg-lo:#0d1c32;--bg-mid:#112036;--bg-hi:#1c2a41;--bg-hst:#27354c;
+  --p:#4edea3;--p-dim:rgba(78,222,163,.12);--p-glow:rgba(78,222,163,.22);--on-p:#002d1b;
+  --fg:#d6e3ff;--muted:#8ba0b5;--out:#2a3a4a;
+  --err:#ff6b6b;--err-dim:rgba(255,107,107,.12);
+  --wrn:#fb923c;--wrn-dim:rgba(251,146,60,.12);
+  --inf:#60a5fa;--inf-dim:rgba(96,165,250,.12);
+  --r:10px;--rl:16px;--rxl:22px;
+  --fd:'Syne',sans-serif;--fm:'JetBrains Mono',monospace;--fb:'Inter',sans-serif;
+  --nav-h:64px;--sw:240px;--bh:60px;--tr:.2s ease;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--fg);font-family:var(--fb);font-size:14px;-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bg-hst);border-radius:99px}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;border:none;background:none;color:inherit;font:inherit}
+.gtex{background-image:radial-gradient(ellipse 80% 60% at 0% 0%,rgba(78,222,163,.04) 0%,transparent 55%),radial-gradient(ellipse 60% 80% at 100% 100%,rgba(78,222,163,.03) 0%,transparent 55%),radial-gradient(#1e3045 .5px,transparent .5px);background-size:auto,auto,24px 24px}
+/* APP SHELL */
+#app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+/* TOPBAR */
+.tb{flex-shrink:0;height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:rgba(4,19,41,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--out);z-index:50;position:relative}
+.tb-l{display:flex;align-items:center;gap:12px}
+.lm{width:34px;height:34px;background:var(--p-dim);border:1px solid rgba(78,222,163,.35);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:13px;color:var(--p);flex-shrink:0}
+.lt{font-family:var(--fd);font-weight:800;font-size:16px;color:var(--p);letter-spacing:.01em}
+.ls{font-family:var(--fm);font-size:9px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-top:1px}
+.tb-r{display:flex;align-items:center;gap:8px}
+.tb-badge{display:flex;align-items:center;gap:6px;padding:5px 12px;background:var(--bg-hi);border:1px solid var(--out);border-radius:99px;font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tb-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--p);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+.tbi{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--bg-hi);border:1px solid var(--out);font-size:16px;transition:background var(--tr);position:relative;cursor:pointer}
+.tbi:hover{background:var(--bg-hst)}
+.nd{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--err);border:1.5px solid var(--bg)}
+.av{width:34px;height:34px;border-radius:99px;background:var(--p-dim);border:2px solid rgba(78,222,163,.3);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:12px;color:var(--p);flex-shrink:0}
+/* BODY AREA */
+.ba{flex:1;display:flex;overflow:hidden;min-height:0}
+/* SIDEBAR */
+.sb{width:var(--sw);flex-shrink:0;display:flex;flex-direction:column;background:var(--bg-lo);border-right:1px solid var(--out);overflow-y:auto;transition:transform var(--tr)}
+.sb-asset{padding:16px;border-bottom:1px solid var(--out);background:var(--bg-mid)}
+.al{font-family:var(--fm);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.an{font-family:var(--fd);font-weight:700;font-size:14px;color:var(--fg);margin-bottom:4px}
+.aid{font-family:var(--fm);font-size:10px;color:var(--p)}
+.aigvp{margin-top:10px;display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--wrn-dim);border:1px solid rgba(251,146,60,.25);border-radius:var(--r)}
+.aiv{font-family:var(--fd);font-weight:800;font-size:18px;color:var(--wrn)}
+.aii{font-family:var(--fm);font-size:9px;color:var(--wrn);text-transform:uppercase;letter-spacing:.1em}
+.ibm{height:3px;background:var(--bg-hst);border-radius:99px;overflow:hidden;margin-top:4px}
+.ibmf{height:100%;border-radius:99px;background:linear-gradient(90deg,#4edea3,#fb923c,#ff4444)}
+.ns{padding:12px 12px 4px;font-family:var(--fm);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.ni{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:var(--r);margin:0 6px 2px;font-family:var(--fm);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);transition:all var(--tr);cursor:pointer;position:relative}
+.ni:hover{background:var(--bg-hi);color:var(--fg)}
+.ni.active{background:var(--p-dim);color:var(--p);border:1px solid rgba(78,222,163,.2)}
+.ni .ico{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.nb{margin-left:auto;background:var(--err);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;font-family:var(--fm)}
+.nb.w{background:var(--wrn);color:var(--on-p)}
+.sbf{margin-top:auto;padding:12px;border-top:1px solid var(--out)}
+.ss{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg-mid);border:1px solid var(--out);border-radius:var(--r);font-family:var(--fm);font-size:10px;color:var(--muted)}
+.ssd{width:7px;height:7px;border-radius:50%;background:var(--p);animation:pulse 2s infinite;flex-shrink:0}
+/* MAIN */
+.mc{flex:1;overflow-y:auto;position:relative}
+/* BOTTOM NAV */
+.bn{display:none;height:var(--bh);background:var(--bg-lo);border-top:1px solid var(--out);flex-shrink:0;overflow-x:auto}
+.bni{display:flex;height:100%;min-width:max-content}
+.bni-item{min-width:56px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-family:var(--fm);font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:color var(--tr);position:relative;padding:0 4px}
+.bni-item.active{color:var(--p)}
+.bni-item .bico{font-size:18px}
+.bnot{position:absolute;top:6px;right:calc(50% - 16px);width:7px;height:7px;border-radius:50%;background:var(--err);border:1.5px solid var(--bg-lo)}
+@media(max-width:768px){.sb{display:none}.bn{display:flex}.tb-badge{display:none}}
+/* SCREENS */
+.scr{display:none;padding:24px;animation:fi .25s ease}
+.scr.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+/* COMPONENTS */
+.sh{margin-bottom:20px}
+.sh-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:10px}
+.shl{font-family:var(--fm);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--p)}
+.sht{font-family:var(--fd);font-weight:800;font-size:22px;color:var(--fg);letter-spacing:-.02em}
+.shs{font-size:12px;color:var(--muted);margin-top:4px}
+.sha{display:flex;gap:8px;align-items:center}
+.card{background:var(--bg-mid);border:1px solid var(--out);border-radius:var(--rl);overflow:hidden}
+.ch{padding:14px 18px;border-bottom:1px solid var(--out);display:flex;align-items:center;justify-content:space-between}
+.ct{font-family:var(--fm);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--p)}
+.cb{padding:18px}
+.kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.k{background:var(--bg-mid);border:1px solid var(--out);border-radius:var(--rl);padding:16px;transition:border-color var(--tr)}
+.k:hover{border-color:rgba(78,222,163,.3)}
+.kl{font-family:var(--fm);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.kv{font-family:var(--fd);font-weight:800;font-size:26px;color:var(--fg);line-height:1;margin-bottom:4px}
+.kv.g{color:var(--p)}.kv.w{color:var(--wrn)}.kv.e{color:var(--err)}
+.ks{font-family:var(--fm);font-size:10px;color:var(--muted)}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-family:var(--fm);font-size:9px;letter-spacing:.08em;text-transform:uppercase;font-weight:700}
+.tg{background:var(--p-dim);border:1px solid rgba(78,222,163,.3);color:var(--p)}
+.tw{background:var(--wrn-dim);border:1px solid rgba(251,146,60,.3);color:var(--wrn)}
+.te{background:var(--err-dim);border:1px solid rgba(255,107,107,.3);color:var(--err)}
+.ti{background:var(--inf-dim);border:1px solid rgba(96,165,250,.3);color:var(--inf)}
+.tgr{background:var(--bg-hi);border:1px solid var(--out);color:var(--muted)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--r);font-family:var(--fm);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;transition:all var(--tr);cursor:pointer;border:none}
+.btp{background:var(--p);color:var(--on-p)}.btp:hover{opacity:.85;transform:translateY(-1px)}
+.bto{background:transparent;border:1px solid var(--out);color:var(--fg)}.bto:hover{border-color:var(--p);background:var(--p-dim)}
+.btg{background:transparent;color:var(--muted)}.btg:hover{color:var(--fg);background:var(--bg-hi)}
+.bts{padding:6px 12px;font-size:10px}
+.pbar{height:6px;background:var(--bg-hst);border-radius:99px;overflow:hidden}
+.pbf{height:100%;border-radius:99px;transition:width .6s ease}
+.al2{padding:12px 16px;border-radius:var(--r);border-left:3px solid;margin-bottom:8px;cursor:pointer;transition:background var(--tr)}
+.al2:hover{filter:brightness(1.1)}
+.ale{background:var(--err-dim);border-color:var(--err)}
+.alw{background:var(--wrn-dim);border-color:var(--wrn)}
+.ali{background:var(--inf-dim);border-color:var(--inf)}
+.alg{background:var(--p-dim);border-color:var(--p)}
+.alt{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.atl{font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;font-weight:700}
+.atm{font-family:var(--fm);font-size:9px;color:var(--muted)}
+.ati{font-size:13px;font-weight:600;color:var(--fg);margin-bottom:2px}
+.atd{font-size:11px;color:var(--muted)}
+/* TABLE */
+.tw2{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{border-bottom:1px solid var(--out)}
+th{padding:10px 16px;text-align:left;font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+td{padding:12px 16px;font-size:13px;color:var(--fg);border-bottom:1px solid rgba(42,58,74,.5);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr{transition:background var(--tr);cursor:pointer}
+tbody tr:hover{background:var(--bg-hst)}
+/* MODAL */
+.mo{position:fixed;inset:0;background:rgba(4,19,41,.85);backdrop-filter:blur(6px);z-index:200;display:none;align-items:flex-end;justify-content:center}
+@media(min-width:769px){.mo{align-items:center;padding:24px}}
+.mo.open{display:flex}
+.md{background:var(--bg-lo);border:1px solid var(--out);border-radius:var(--rxl) var(--rxl) 0 0;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;animation:su .3s cubic-bezier(.22,.68,0,1.2)}
+@media(min-width:769px){.md{border-radius:var(--rxl);animation:zi .25s ease}}
+@keyframes su{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes zi{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+.mh{padding:20px 20px 0;display:flex;align-items:center;justify-content:space-between}
+.mt2{font-family:var(--fd);font-weight:800;font-size:18px;color:var(--fg)}
+.mc2{width:32px;height:32px;background:var(--bg-hi);border-radius:99px;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted);cursor:pointer;transition:all var(--tr)}
+.mc2:hover{background:var(--bg-hst);color:var(--fg)}
+.mb2{padding:20px}
+/* FORM */
+.fg2{margin-bottom:16px}
+.fl{font-family:var(--fm);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:block}
+.fi{width:100%;padding:10px 14px;background:var(--bg-mid);border:1px solid var(--out);border-radius:var(--r);color:var(--fg);font-family:var(--fb);font-size:13px;transition:border-color var(--tr);outline:none}
+.fi:focus{border-color:var(--p)}
+.fsel{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238ba0b5' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:calc(100% - 12px) center;padding-right:32px}
+.fta{resize:vertical;min-height:80px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:480px){.fr{grid-template-columns:1fr}}
+.fe{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
+/* DRAWER */
+.dr{position:fixed;inset-y:0;right:0;width:min(440px,100vw);background:var(--bg-lo);border-left:1px solid var(--out);z-index:150;transform:translateX(100%);transition:transform .3s cubic-bezier(.22,.68,0,1.2);display:flex;flex-direction:column;overflow:hidden}
+.dr.open{transform:translateX(0)}
+.dro{position:fixed;inset:0;background:rgba(4,19,41,.6);backdrop-filter:blur(4px);z-index:140;display:none}
+.dro.open{display:block}
+.drh{padding:18px 18px 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.drt{font-family:var(--fd);font-weight:800;font-size:17px;color:var(--fg)}
+.drb{flex:1;overflow-y:auto;padding:18px}
+.drf{padding:14px 18px;border-top:1px solid var(--out);display:flex;gap:10px;flex-shrink:0}
+/* TOAST */
+.tc{position:fixed;bottom:80px;right:20px;z-index:300;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+@media(min-width:769px){.tc{bottom:24px}}
+.toast{background:var(--bg-hi);border:1px solid var(--out);border-radius:var(--rl);padding:12px 16px;min-width:240px;max-width:320px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,.4);animation:tin .3s ease;pointer-events:all;font-size:13px}
+.toast.rm{animation:tout .3s ease forwards}
+@keyframes tin{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes tout{to{transform:translateX(60px);opacity:0}}
+/* TIMELINE */
+.tl{position:relative;padding-left:28px}
+.tl::before{content:'';position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:var(--out)}
+.tln{position:relative;margin-bottom:20px}
+.tld{position:absolute;left:-24px;top:4px;width:14px;height:14px;border-radius:50%;border:2px solid var(--bg-lo);z-index:1}
+.tld.g{background:var(--p)}.tld.gr{background:var(--bg-hst);border-color:var(--out)}.tld.w{background:var(--wrn)}
+.tlc{background:var(--bg-mid);border:1px solid var(--out);border-radius:var(--rl);padding:14px 16px;transition:all var(--tr);cursor:pointer}
+.tlc:hover{border-color:rgba(78,222,163,.3);background:var(--bg-hst)}
+.tlm{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px}
+.tld2{font-family:var(--fm);font-size:9px;letter-spacing:.1em;color:var(--p)}
+.tlt{font-family:var(--fd);font-weight:700;font-size:14px;color:var(--fg);margin-bottom:4px}
+.tlde{font-size:12px;color:var(--muted);line-height:1.5}
+.tlf{margin-top:10px;padding-top:10px;border-top:1px solid var(--out);display:flex;align-items:center;justify-content:space-between}
+.tlr{font-family:var(--fm);font-size:9px;color:var(--muted)}
+/* PROVIDERS */
+.pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.pc{background:var(--bg-mid);border:1px solid var(--out);border-radius:var(--rl);padding:18px;cursor:pointer;transition:all var(--tr)}
+.pc:hover{border-color:rgba(78,222,163,.35);transform:translateY(-2px)}
+.pch{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.pi{width:40px;height:40px;background:var(--bg-hst);border:1px solid var(--out);border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:20px}
+.pn{font-family:var(--fd);font-weight:700;font-size:15px;color:var(--fg);margin-bottom:2px}
+.ps{font-family:var(--fm);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.pb{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.pbr{display:flex;align-items:center;gap:8px}
+.pbl{font-family:var(--fm);font-size:9px;color:var(--muted);width:80px;flex-shrink:0}
+.pf{margin-top:12px;padding-top:12px;border-top:1px solid var(--out);display:flex;align-items:center;justify-content:space-between}
+.pid{font-family:var(--fm);font-size:9px;color:var(--muted)}
+.par{color:var(--muted);font-size:14px;transition:transform var(--tr)}
+.pc:hover .par{transform:translateX(3px);color:var(--p)}
+/* RIV */
+.rr{background:var(--bg-mid);border:1px solid var(--out);border-radius:var(--rl);padding:16px;margin-bottom:10px;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden;cursor:pointer;transition:all var(--tr)}
+.rr:hover{border-color:rgba(78,222,163,.3)}
+.rs{position:absolute;top:0;right:0;width:3px;height:100%;border-radius:0 var(--rl) var(--rl) 0}
+.rt{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.rn{font-family:var(--fd);font-weight:700;font-size:15px;color:var(--fg)}
+.rc{font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.rg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.rf{font-size:11px;color:var(--muted)}
+.rf strong{display:block;font-family:var(--fm);font-size:12px;color:var(--fg);font-weight:500;margin-bottom:2px}
+/* STEPPER */
+.stp{display:flex;overflow:hidden;background:var(--bg-lo);border:1px solid var(--out);border-radius:var(--rl);margin-bottom:20px}
+.sti{flex:1;padding:12px 8px;text-align:center;border-right:1px solid var(--out);transition:all var(--tr);cursor:pointer}
+.sti:last-child{border-right:none}
+.sti.done{background:var(--p-dim)}
+.sti.active{background:rgba(78,222,163,.08);border-bottom:2px solid var(--p)}
+.sti .stico{font-size:16px;margin-bottom:4px}
+.sti .stla{font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.sti.active .stla,.sti.done .stla{color:var(--p)}
+/* FILTER */
+.fr2{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px}
+.fr2::-webkit-scrollbar{display:none}
+.chip{padding:6px 14px;border-radius:99px;font-family:var(--fm);font-size:10px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--out);color:var(--muted);cursor:pointer;transition:all var(--tr);white-space:nowrap;flex-shrink:0}
+.chip:hover{border-color:var(--p);color:var(--fg)}
+.chip.active{background:var(--p-dim);border-color:rgba(78,222,163,.4);color:var(--p)}
+/* SEARCH */
+.sw{position:relative;margin-bottom:16px}
+.si{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--muted);pointer-events:none}
+.sinp{width:100%;padding:10px 14px 10px 36px;background:var(--bg-mid);border:1px solid var(--out);border-radius:var(--r);color:var(--fg);font-family:var(--fb);font-size:13px;outline:none;transition:border-color var(--tr)}
+.sinp:focus{border-color:var(--p)}
+.sinp::placeholder{color:var(--muted)}
+/* SEAL */
+.seal{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:var(--p-dim);border:1px solid rgba(78,222,163,.3);border-radius:99px;font-family:var(--fm);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--p)}
+/* LAYOUT */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:640px){.two{grid-template-columns:1fr}}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:640px){.three{grid-template-columns:1fr}}
+.dv{border:none;border-top:1px solid var(--out);margin:16px 0}
+.fb{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.mt4{margin-top:4px}.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
+.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
+/* gauge */
+.gnum{font-family:var(--fd);font-weight:800;font-size:42px;line-height:1;color:var(--fg);text-align:center}
+.gst{font-family:var(--fm);font-size:10px;letter-spacing:.15em;text-transform:uppercase;text-align:center;margin-top:4px}
+</style>
+</head>
+<body>
+<div id="app" class="gtex">
+<!-- TOPBAR -->
+<header class="tb">
+  <div class="tb-l">
+    <div class="lm">IX</div>
+    <div><div class="lt">INVEXA 360°</div><div class="ls">Gestión Patrimonial</div></div>
+  </div>
+  <div class="tb-r">
+    <div class="tb-badge"><span class="dot"></span>Torre Corporativa Caracas</div>
+    <div class="tbi" onclick="oM('nm')"><span>🔔</span><div class="nd"></div></div>
+    <div class="tbi" onclick="oM('pm')"><span>⚙️</span></div>
+    <div class="av">AA</div>
+  </div>
+</header>
+<div class="ba">
+<!-- SIDEBAR -->
+<nav class="sb">
+  <div class="sb-asset">
+    <div class="al">Activo Contenedor</div>
+    <div class="an">Torre Corporativa Caracas</div>
+    <div class="aid">TCC-2024-001 · Piso 22</div>
+    <div class="aigvp">
+      <div><div class="aiv">45%</div><div class="ibm"><div class="ibmf" style="width:45%"></div></div></div>
+      <div><div class="aii">IGVP</div><div style="font-family:var(--fm);font-size:8px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.08em">Moderado</div></div>
+    </div>
+  </div>
+  <div class="ns">Módulos</div>
+  <div class="ni active" onclick="nav('dashboard',this)"><span class="ico">📊</span>Dashboard</div>
+  <div class="ni" onclick="nav('clb',this)"><span class="ico">🔍</span>CLB — Línea Base<span class="nb w">3</span></div>
+  <div class="ni" onclick="nav('libro',this)"><span class="ico">📖</span>Libro Blanco</div>
+  <div class="ni" onclick="nav('siva',this)"><span class="ico">🛡️</span>SIVA — Proveedores</div>
+  <div class="ni" onclick="nav('pmgi',this)"><span class="ico">🏛️</span>Gestión Inst.<span class="nb">!</span></div>
+  <div class="ni" onclick="nav('pmco',this)"><span class="ico">⚙️</span>Control Operativo</div>
+  <div class="ni" onclick="nav('pmfgpc',this)"><span class="ico">🎓</span>Formación</div>
+  <div class="ni" onclick="nav('pmagpc',this)"><span class="ico">⚖️</span>Arbitraje</div>
+  <div class="ns">Sistema</div>
+  <div class="ni" onclick="nav('rep',this)"><span class="ico">📄</span>Reportes</div>
+  <div class="sbf">
+    <div class="ss"><div class="ssd"></div><span>Sistema Operativo · v2.4.1</span></div>
+  </div>
+</nav>
+<!-- MAIN -->
+<main class="mc" id="mc">
+<!-- SCREEN: DASHBOARD -->
+<div id="s-dashboard" class="scr active" style="max-width:1100px">
+  <div class="sh"><div class="sh-top"><div><div class="shl">Dashboard Principal</div><div class="sht">Resumen del Activo</div><div class="shs">Torre Corporativa Caracas · Actualizado hace 4 min</div></div><div class="sha"><button class="btn bto bts" onclick="toast('📊 Generando reporte...','i')">Exportar</button><button class="btn btp bts" onclick="oM('nhm')">+ Hallazgo</button></div></div></div>
+  <div class="kg">
+    <div class="k"><div class="kl">IGVP Actual</div><div class="kv w">45%</div><div class="ks">▲ +2% vs mes anterior</div></div>
+    <div class="k"><div class="kl">Deuda Técnica</div><div class="kv e">$12,450</div><div class="ks">+1.2% vs Q3</div></div>
+    <div class="k"><div class="kl">Sistemas Vitales</div><div class="kv">4/5</div><div class="ks">1 en falla crítica</div></div>
+    <div class="k"><div class="kl">Libro Blanco</div><div class="kv g">88%</div><div class="ks">Completado</div></div>
+    <div class="k"><div class="kl">Proveedores SIVA</div><div class="kv g">12</div><div class="ks">Certificados activos</div></div>
+    <div class="k"><div class="kl">Disparadores</div><div class="kv e">3</div><div class="ks">2 críticos · 1 adv.</div></div>
+  </div>
+  <div class="two mb16">
+    <div class="card">
+      <div class="ch"><span class="ct">Indicador IGVP · Semáforo</span><span class="tag tw">Moderado</span></div>
+      <div class="cb" style="display:flex;flex-direction:column;align-items:center;gap:14px">
+        <svg width="180" height="108" viewBox="0 0 180 108">
+          <path d="M18 95 A72 72 0 0 1 162 95" fill="none" stroke="#1c2a41" stroke-width="14" stroke-linecap="round"/>
+          <path d="M18 95 A72 72 0 0 1 162 95" fill="none" stroke="url(#g1)" stroke-width="14" stroke-linecap="round" stroke-dasharray="226" stroke-dashoffset="124"/>
+          <defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#4edea3"/><stop offset="55%" stop-color="#fb923c"/><stop offset="100%" stop-color="#ff4444"/></linearGradient></defs>
+          <line x1="90" y1="95" x2="54" y2="40" stroke="#fb923c" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="90" cy="95" r="6" fill="#fb923c"/><circle cx="90" cy="95" r="3.5" fill="#112036"/>
+          <text x="14" y="108" fill="#4edea3" font-family="JetBrains Mono" font-size="9">0%</text>
+          <text x="83" y="20" fill="#8ba0b5" font-family="JetBrains Mono" font-size="9" text-anchor="middle">50%</text>
+          <text x="162" y="108" fill="#ff4444" font-family="JetBrains Mono" font-size="9" text-anchor="end">100%</text>
+        </svg>
+        <div style="text-align:center"><div class="gnum">45%</div><div class="gst" style="color:var(--wrn)">⚠ Vulnerabilidad Moderada</div></div>
+        <div style="width:100%;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:50%;background:#4edea3;flex-shrink:0"></div><span style="font-family:var(--fm);font-size:10px;color:var(--muted);flex:1">Controlado</span><span style="font-family:var(--fm);font-size:10px;color:var(--muted)">0–25%</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:50%;background:#facc15;flex-shrink:0"></div><span style="font-family:var(--fm);font-size:10px;color:var(--p);flex:1">Moderado ◄ actual</span><span style="font-family:var(--fm);font-size:10px;color:var(--p)">26–50%</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:50%;background:#fb923c;flex-shrink:0"></div><span style="font-family:var(--fm);font-size:10px;color:var(--muted);flex:1">Avanzado</span><span style="font-family:var(--fm);font-size:10px;color:var(--muted)">51–75%</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:50%;background:#ff4444;flex-shrink:0"></div><span style="font-family:var(--fm);font-size:10px;color:var(--muted);flex:1">Crítico</span><span style="font-family:var(--fm);font-size:10px;color:var(--muted)">76–100%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">⚡ Disparadores Activos</span><button class="btn btg bts">Ver todos</button></div>
+      <div class="cb">
+        <div class="al2 ale" onclick="oD('d1')"><div class="alt"><span class="atl" style="color:var(--err)">Crítico</span><span class="atm">Hace 2h</span></div><div class="ati">Mantenimiento Ascensores Vencido</div><div class="atd">TK-4402 · Preventivo expirado Torre A · $8,900</div></div>
+        <div class="al2 ale" onclick="oD('d2')"><div class="alt"><span class="atl" style="color:var(--err)">Crítico</span><span class="atm">Hace 3h</span></div><div class="ati">Sistema CO₂ en Falla (15% operatividad)</div><div class="atd">SYS-0031 · Extinción planta baja comprometida</div></div>
+        <div class="al2 alw" onclick="oD('d3')"><div class="alt"><span class="atl" style="color:var(--wrn)">Advertencia</span><span class="atm">Hace 5h</span></div><div class="ati">Póliza de Incendio Vencida</div><div class="atd">LG-9912 · Renovación requerida antes del 30/06</div></div>
+        <div class="al2 ali mt12"><div class="alt"><span class="atl" style="color:var(--inf)">Info</span><span class="atm">Ayer</span></div><div class="ati">Auditoría Semestral Programada</div><div class="atd">AD-1022 · Lunes 03/06 a las 09:00am</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card mb16">
+    <div class="ch"><span class="ct">Monitoreo Activos Críticos · RIV-01</span><button class="btn bto bts" onclick="nav('clb',document.querySelectorAll('.ni')[1])">Ver CLB</button></div>
+    <div class="tw2"><table><thead><tr><th>Sistema</th><th>Última Insp.</th><th>Operatividad</th><th>Deuda Técnica</th><th>Estatus</th></tr></thead><tbody>
+      <tr onclick="oD('a1')"><td><strong>Sistema de Ascensores P1</strong><br><small style="color:var(--muted);font-size:11px">Torre A · 3 cabinas</small></td><td style="font-family:var(--fm);font-size:11px">15 FEB 2024</td><td style="font-family:var(--fm);color:var(--err)">33%</td><td style="font-family:var(--fm)">$8,900</td><td><span class="tag te">Falla Crítica</span></td></tr>
+      <tr onclick="oD('a2')"><td><strong>Bomba Hidroneumática</strong><br><small style="color:var(--muted);font-size:11px">Pisos 1–12</small></td><td style="font-family:var(--fm);font-size:11px">05 NOV 2023</td><td style="font-family:var(--fm);color:var(--wrn)">75%</td><td style="font-family:var(--fm)">$3,200</td><td><span class="tag tw">Preventivo</span></td></tr>
+      <tr onclick="oD('a3')"><td><strong>Planta Eléctrica Principal</strong><br><small style="color:var(--muted);font-size:11px">480KVA Cummins</small></td><td style="font-family:var(--fm);font-size:11px">12 OCT 2023</td><td style="font-family:var(--fm);color:var(--p)">100%</td><td style="font-family:var(--fm)">$0</td><td><span class="tag tg">Óptimo</span></td></tr>
+      <tr onclick="oD('a4')"><td><strong>Sistema Extinción CO₂</strong><br><small style="color:var(--muted);font-size:11px">8 niveles</small></td><td style="font-family:var(--fm);font-size:11px">22 SEP 2023</td><td style="font-family:var(--fm);color:var(--err)">15%</td><td style="font-family:var(--fm)">$4,200</td><td><span class="tag te">Falla Crítica</span></td></tr>
+      <tr onclick="oD('a5')"><td><strong>CCTV y Control de Acceso</strong><br><small style="color:var(--muted);font-size:11px">48 cámaras</small></td><td style="font-family:var(--fm);font-size:11px">18 ENE 2024</td><td style="font-family:var(--fm);color:var(--p)">96%</td><td style="font-family:var(--fm)">$150</td><td><span class="tag tg">Óptimo</span></td></tr>
+    </tbody></table></div>
+  </div>
+  <div class="card">
+    <div class="ch"><span class="ct">Evolución IGVP — 8 meses</span><div style="display:flex;gap:5px"><span class="chip active bts" style="font-size:9px;padding:4px 10px">6M</span><span class="chip bts" style="font-size:9px;padding:4px 10px">1A</span><span class="chip bts" style="font-size:9px;padding:4px 10px">2A</span></div></div>
+    <div class="cb">
+      <div style="display:flex;align-items:flex-end;gap:8px;height:90px;padding:0 4px">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px"><div style="width:100%;background:rgba(78,222,163,.2);border-top:2px solid rgba(78,222,163,.5);border-radius:3px 3px 0 0;height:38px"></div><span style="font-family:var(--fm);font-size:9px;color:var(--muted)">SEP</span></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px"><div style="width:100%;background:rgba(78,222,163,.2);border-top:2px solid rgba(78,222,163,.5);border-radius:3px 3px 0 0;height:42px"></div><span style="font-family:var(--fm);font-size:9px;color:var(--muted)">OCT</span></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px"><div style="width:100%;background:rgba(78,222,163,.2);border-top:2px solid rgba(78,222,163,.5);border-radius:3px 3px 0 0;height:36px"></div><span style="font-family:var(--fm);font-size:9px;color:var(--muted)">NOV</span></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px"><div style="width:100%;background:rgba(251,146,60,.2);border-top:2px solid rgba(251,146,60,.5);border-radius:3px 3px 0 0;height:50px"></div><span style="font-family:var(--fm);font-size:9px;color:var(--muted)">DIC</span></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px"><div style="width:100%;background:rgba(78,222,163,.2);border-top:2px solid rgba(78,222,163,.5);border-radius:3px 3px 0 0;height:40px"></div><span style="font-family:var(--fm);font-size:9px;color:var(--muted)">ENE</span></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px"><div style="width:100%;background:rgba(78,222,163,.2);border-top:2px solid rgba(78,222,163,.5);border-radius:3px 3px 0 0;height:35px"></div><span style="font-family:var(--fm);font-size:9px;color:var(--muted)">FEB</span></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px"><div style="width:100%;background:rgba(78,222,163,.2);border-top:2px solid rgba(78,222,163,.5);border-radius:3px 3px 0 0;height:32px"></div><span style="font-family:var(--fm);font-size:9px;color:var(--muted)">MAR</span></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px"><div style="width:100%;background:rgba(251,146,60,.3);border-top:2px solid var(--wrn);border-radius:3px 3px 0 0;height:45px"></div><span style="font-family:var(--fm);font-size:9px;color:var(--p)">ABR◄</span></div>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:14px"><div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:3px;background:rgba(78,222,163,.7);border-radius:2px"></div><span style="font-family:var(--fm);font-size:9px;color:var(--muted)">IGVP Real</span></div><div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:3px;background:rgba(251,146,60,.7);border-radius:2px"></div><span style="font-family:var(--fm);font-size:9px;color:var(--muted)">Alerta</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: CLB -->
+<div id="s-clb" class="scr" style="max-width:1000px">
+  <div class="sh"><div class="sh-top"><div><div class="shl">Módulo I · CLB</div><div class="sht">Certificación de Línea Base</div><div class="shs">Expediente RIV-01-2024 · Estado Cero: Torre Corporativa Caracas</div></div><div class="sha"><button class="btn bto bts" onclick="toast('📄 Generando Pieza Probatoria...','i')">Generar Cert.</button><button class="btn btp bts" onclick="oM('nhm')">+ Hallazgo</button></div></div></div>
+  <div class="stp"><div class="sti done"><div class="stico">⚖️</div><div class="stla">Legal</div></div><div class="sti done"><div class="stico">📊</div><div class="stla">Admin</div></div><div class="sti active"><div class="stico">⚙️</div><div class="stla">Técnica</div></div><div class="sti"><div class="stico">🏁</div><div class="stla">Cierre</div></div></div>
+  <div class="three mb16">
+    <div class="k"><div class="kl">Expediente</div><div class="kv" style="font-size:16px">RIV-01-2024</div><div class="ks"><span class="tag ti">En Proceso</span></div></div>
+    <div class="k"><div class="kl">Hallazgos</div><div class="kv e">14</div><div class="ks">4 críticos · 6 mod · 4 ópt</div></div>
+    <div class="k"><div class="kl">Deuda Técnica</div><div class="kv e">$16,450</div><div class="ks">Valorización forense</div></div>
+  </div>
+  <div class="fr2">
+    <div class="chip active" onclick="fRIV('t',this)">Todos (14)</div>
+    <div class="chip" onclick="fRIV('c',this)">Crítico (4)</div>
+    <div class="chip" onclick="fRIV('m',this)">Moderado (6)</div>
+    <div class="chip" onclick="fRIV('o',this)">Óptimo (4)</div>
+  </div>
+  <div id="rl">
+    <div class="rr" data-n="c" onclick="oD('rc1')"><div class="rs" style="background:var(--err)"></div><div class="rt"><div><div class="rn">Sistema de Ascensores P1</div><div class="rc">Elevación · Torre A · 3 cabinas</div></div><span class="tag te">Crítico</span></div><div class="rg"><div class="rf"><strong>$8,900</strong>Impacto Econ.</div><div class="rf"><strong style="color:var(--p)">VIGENTE</strong>Custodia</div><div class="rf"><strong style="color:var(--err)">33%</strong>Operatividad</div></div></div>
+    <div class="rr" data-n="c" onclick="oD('rc2')"><div class="rs" style="background:var(--err)"></div><div class="rt"><div><div class="rn">Sistema Extinción CO₂</div><div class="rc">Seguridad incendios · 8 niveles</div></div><span class="tag te">Crítico</span></div><div class="rg"><div class="rf"><strong>$4,200</strong>Impacto Econ.</div><div class="rf"><strong style="color:var(--err)">PENDIENTE</strong>Custodia</div><div class="rf"><strong style="color:var(--err)">15%</strong>Operatividad</div></div></div>
+    <div class="rr" data-n="c" onclick="oD('rc3')"><div class="rs" style="background:var(--err)"></div><div class="rt"><div><div class="rn">Póliza de Seguro — Incendio</div><div class="rc">Legal · Renovación obligatoria</div></div><span class="tag te">Crítico</span></div><div class="rg"><div class="rf"><strong>—</strong>Prima est.</div><div class="rf"><strong style="color:var(--err)">VENCIDA</strong>Vigencia</div><div class="rf"><strong style="color:var(--err)">—</strong>Cobertura</div></div></div>
+    <div class="rr" data-n="c" onclick="oD('rc4')"><div class="rs" style="background:var(--err)"></div><div class="rt"><div><div class="rn">Impermeabilización Terraza N.22</div><div class="rc">Estructural · Filtración activa</div></div><span class="tag te">Crítico</span></div><div class="rg"><div class="rf"><strong>$3,350</strong>Impacto Econ.</div><div class="rf"><strong style="color:var(--wrn)">EN REVISIÓN</strong>Custodia</div><div class="rf"><strong style="color:var(--err)">Activa</strong>Filtración</div></div></div>
+    <div class="rr" data-n="m" onclick="oD('rm1')"><div class="rs" style="background:var(--wrn)"></div><div class="rt"><div><div class="rn">Bomba Hidroneumática</div><div class="rc">Hidráulico · Pisos 1–12</div></div><span class="tag tw">Moderado</span></div><div class="rg"><div class="rf"><strong>$3,200</strong>Impacto Econ.</div><div class="rf"><strong style="color:var(--p)">VIGENTE</strong>Custodia</div><div class="rf"><strong style="color:var(--wrn)">75%</strong>Operatividad</div></div></div>
+    <div class="rr" data-n="m" onclick="oD('rm2')"><div class="rs" style="background:var(--wrn)"></div><div class="rt"><div><div class="rn">Fachada Vidrio — Sellado</div><div class="rc">Acabados · Pisos 8–14</div></div><span class="tag tw">Moderado</span></div><div class="rg"><div class="rf"><strong>$2,100</strong>Impacto Econ.</div><div class="rf"><strong style="color:var(--p)">VIGENTE</strong>Custodia</div><div class="rf"><strong style="color:var(--wrn)">60%</strong>Integridad</div></div></div>
+    <div class="rr" data-n="o" onclick="oD('ro1')"><div class="rs" style="background:var(--p)"></div><div class="rt"><div><div class="rn">Planta Eléctrica Principal</div><div class="rc">Eléctrico · 480KVA Cummins</div></div><span class="tag tg">Óptimo</span></div><div class="rg"><div class="rf"><strong>$0</strong>Impacto Econ.</div><div class="rf"><strong style="color:var(--p)">VIGENTE</strong>Custodia</div><div class="rf"><strong style="color:var(--p)">100%</strong>Operatividad</div></div></div>
+    <div class="rr" data-n="o" onclick="oD('ro2')"><div class="rs" style="background:var(--p)"></div><div class="rt"><div><div class="rn">CCTV y Control de Acceso</div><div class="rc">Seguridad · 48 cámaras</div></div><span class="tag tg">Óptimo</span></div><div class="rg"><div class="rf"><strong>$150</strong>Impacto Econ.</div><div class="rf"><strong style="color:var(--p)">VIGENTE</strong>Custodia</div><div class="rf"><strong style="color:var(--p)">96%</strong>Operatividad</div></div></div>
+  </div>
+  <div style="margin-top:20px;padding:20px;background:var(--p-dim);border:1px solid rgba(78,222,163,.25);border-radius:var(--rl);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
+    <div><div style="font-family:var(--fd);font-weight:700;font-size:15px;color:var(--p);margin-bottom:4px">Generar Pieza Probatoria</div><div style="font-size:12px;color:var(--muted)">Certificado Idoneidad Técnica · RIV-01-2024</div></div>
+    <button class="btn btp" onclick="toast('✅ Pieza Probatoria generada','g')">✦ Generar Certificado</button>
+  </div>
+</div>
+
+<!-- SCREEN: LIBRO BLANCO -->
+<div id="s-libro" class="scr" style="max-width:900px">
+  <div class="sh"><div class="sh-top"><div><div class="shl">Módulo II · PSLB</div><div class="sht">Libro Blanco Digital</div><div class="shs">Registro Inmutable · Caja Negra Patrimonial</div></div><div class="sha"><button class="btn btp bts" onclick="oM('nnm')">+ Nodo</button></div></div></div>
+  <div class="sw"><span class="si">🔍</span><input type="text" class="sinp" placeholder="Buscar en historial inmutable..." oninput="fTL(this.value)"/></div>
+  <div class="fr2">
+    <div class="chip active">Todo</div><div class="chip">Legal</div><div class="chip">Técnico</div><div class="chip">Financiero</div><div class="chip">Asamblea</div>
+  </div>
+  <div class="tl" id="tl">
+    <div class="tln"><div class="tld g"></div><div class="tlc" onclick="oD('l1')"><div class="tlm"><span class="tld2">22 MAR 2024 · 10:14am</span><span class="seal">✦ Verificado</span></div><div class="tlt">Asamblea General de Copropietarios</div><div class="tlde">Validación estados financieros 2023 y aprobación plan de inversión 2024–2025 por Bs.S 85,000. Quórum: 78% (33/42 propietarios).</div><div class="tlf"><span class="tlr">DOC: ACTA_AGO_772.PDF · SHA: a3f9c1…</span><button class="btn btg bts">Ver nodo →</button></div></div></div>
+    <div class="tln"><div class="tld w"></div><div class="tlc" onclick="oD('l2')"><div class="tlm"><span class="tld2" style="color:var(--wrn)">15 FEB 2024 · 08:30am</span><span class="tag tw">Mantenimiento</span></div><div class="tlt">Mantenimiento Mayor — Ascensores Torre A</div><div class="tlde">Sustitución motores de tracción cabinas 1 y 2. Certificación OTIS Venezuela. LiftTech S.A. (VEN-2104 SIVA: APTO). Contrato $12,800.</div><div class="tlf"><span class="tlr">ID: MAINT_3309 · SIVA: APTO</span><button class="btn btg bts">Ver nodo →</button></div></div></div>
+    <div class="tln"><div class="tld g"></div><div class="tlc" onclick="oD('l3')"><div class="tlm"><span class="tld2">30 ENE 2024 · 03:45pm</span><span class="seal">✦ Verificado</span></div><div class="tlt">Validación Factura Maestra — Impuestos Q4</div><div class="tlde">Pago retenciones IVA e ISLR corporativos Q4/2023. Dualidad Probatoria confirmada: Factura SENIAT + Aval Técnico-Contable.</div><div class="tlf"><span class="tlr">REF: TX-882190 · SENIAT: Validado</span><button class="btn btg bts">Ver nodo →</button></div></div></div>
+    <div class="tln"><div class="tld g"></div><div class="tlc" onclick="oD('l4')"><div class="tlm"><span class="tld2">12 ENE 2024 · 11:00am</span><span class="seal">✦ Verificado</span></div><div class="tlt">Certificación CLB — Diagnóstico Estado Cero</div><div class="tlde">Primera fijación de línea base estructural, financiera y legal bajo INVEXA 360°. 14 hallazgos registrados. IGVP inicial: 48%.</div><div class="tlf"><span class="tlr">DOC: CLB_TCC_2024_001.PDF</span><button class="btn btg bts">Ver nodo →</button></div></div></div>
+    <div class="tln"><div class="tld gr"></div><div class="tlc" onclick="oD('l5')"><div class="tlm"><span class="tld2" style="color:var(--muted)">05 DIC 2023 · 02:00pm</span><span class="tag ti">Junta</span></div><div class="tlt">Reunión Ordinaria — Junta de Condominio</div><div class="tlde">Aprobación contratación preventiva sistema hidroneumático. Tres cotizaciones evaluadas bajo SIVA. Seleccionado: HydroFlow Systems.</div><div class="tlf"><span class="tlr">ACTA_JC_NOV_2023.PDF</span><button class="btn btg bts">Ver nodo →</button></div></div></div>
+    <div class="tln"><div class="tld g"></div><div class="tlc" onclick="oD('l6')"><div class="tlm"><span class="tld2">18 OCT 2023 · 09:00am</span><span class="seal">✦ Verificado</span></div><div class="tlt">Mantenimiento Planta Eléctrica — Cummins 480KVA</div><div class="tlde">Mantenimiento preventivo anual. Cambio aceite, filtros y prueba de carga. ElecCorp certificado SIVA para esta intervención específica.</div><div class="tlf"><span class="tlr">SERV_PE_OCT2023 · $2,400</span><button class="btn btg bts">Ver nodo →</button></div></div></div>
+  </div>
+  <div class="card mt16">
+    <div class="ch"><span class="ct">📁 Explorador de Documentos</span><button class="btn btp bts" onclick="toast('📎 Subiendo documento...','i')">+ Subir</button></div>
+    <div class="cb" style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:14px;padding:12px;background:var(--bg-hi);border:1px solid var(--out);border-radius:var(--r);cursor:pointer;transition:background var(--tr)" onmouseenter="this.style.background='var(--bg-hst)'" onmouseleave="this.style.background='var(--bg-hi)'" onclick="oD('fl1')">
+        <span style="font-size:24px">📁</span><div style="flex:1"><div style="font-family:var(--fd);font-weight:700;font-size:14px">Legal y Estatutos</div><div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">14 archivos · 24.5 MB</div></div><span style="color:var(--muted)">›</span>
+      </div>
+      <div style="position:relative;display:flex;align-items:center;gap:14px;padding:12px;background:var(--bg-hi);border:1px solid rgba(78,222,163,.25);border-radius:var(--r);cursor:pointer" onclick="toast('📄 Abriendo Título de Propiedad...','g')">
+        <div style="width:40px;height:52px;background:var(--bg-lo);border:1px solid var(--out);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📄</div>
+        <div style="flex:1"><div style="font-family:var(--fd);font-weight:700;font-size:14px">Título de Propiedad — Master</div><div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">PDF · 12.8 MB · Actualizado hace 2d</div><div class="seal mt4">✦ Verificado — Inimpugnable</div></div>
+        <button class="btn bto bts">Abrir</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;padding:12px;background:var(--bg-hi);border:1px solid var(--out);border-radius:var(--r);cursor:pointer;transition:background var(--tr)" onmouseenter="this.style.background='var(--bg-hst)'" onmouseleave="this.style.background='var(--bg-hi)'" onclick="oD('fl2')">
+        <span style="font-size:24px">📁</span><div style="flex:1"><div style="font-family:var(--fd);font-weight:700;font-size:14px">Certificaciones SIVA</div><div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">8 archivos · 12.1 MB</div></div><span style="color:var(--muted)">›</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;padding:12px;background:var(--bg-hi);border:1px solid var(--out);border-radius:var(--r);cursor:pointer;transition:background var(--tr)" onmouseenter="this.style.background='var(--bg-hst)'" onmouseleave="this.style.background='var(--bg-hi)'" onclick="oD('fl3')">
+        <span style="font-size:24px">📁</span><div style="flex:1"><div style="font-family:var(--fd);font-weight:700;font-size:14px">Historial de Mantenimientos</div><div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">31 archivos · 67.3 MB</div></div><span style="color:var(--muted)">›</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: SIVA -->
+<div id="s-siva" class="scr" style="max-width:1100px">
+  <div class="sh"><div class="sh-top"><div><div class="shl">Módulo III · SIVA</div><div class="sht">Filtro de Aptitud</div><div class="shs">Directorio Proveedores Certificados</div></div><div class="sha"><button class="btn btp bts" onclick="oM('npm')">+ Proveedor</button></div></div></div>
+  <div class="sw"><span class="si">🔍</span><input type="text" class="sinp" placeholder="Buscar por nombre, especialidad o ID..." oninput="fPR(this.value)"/></div>
+  <div class="fr2">
+    <div class="chip active">Todos (12)</div><div class="chip">Aptos (8)</div><div class="chip">En Revisión (2)</div><div class="chip">No Aptos (2)</div>
+  </div>
+  <div class="pg" id="pg">
+    <div class="pc" onclick="oD('sv1')"><div class="pch"><div class="pi">💧</div><span class="tag tg">Apto</span></div><div class="pn">HydroFlow Systems</div><div class="ps">Hidroneumáticos & Bombas</div><div class="pb"><div class="pbr"><span class="pbl">Técnico</span><div class="pbar" style="flex:1"><div class="pbf" style="width:88%;background:var(--p)"></div></div><span style="font-family:var(--fm);font-size:9px;color:var(--p)">88</span></div><div class="pbr"><span class="pbl">Legal</span><div class="pbar" style="flex:1"><div class="pbf" style="width:100%;background:var(--p)"></div></div><span style="font-family:var(--fm);font-size:9px;color:var(--p)">100</span></div><div class="pbr"><span class="pbl">Historial</span><div class="pbar" style="flex:1"><div class="pbf" style="width:92%;background:var(--p)"></div></div><span style="font-family:var(--fm);font-size:9px;color:var(--p)">92</span></div></div><div class="pf"><span class="pid">VEN-9821</span><span class="par">›</span></div></div>
+    <div class="pc" onclick="oD('sv2')"><div class="pch"><div class="pi">⚡</div><span class="tag te">No Apto</span></div><div class="pn">ElecCorp Industrial</div><div class="ps">Subestaciones Eléctricas</div><div class="pb"><div class="pbr"><span class="pbl">Técnico</span><div class="pbar" style="flex:1"><div class="pbf" style="width:55%;background:var(--err)"></div></div><span style="font-family:var(--fm);font-size:9px;color:var(--err)">55</span></div><div class="pbr"><span class="pbl">Legal</span><div class="pbar" style="flex:1"><div class="pbf" style="width:40%;background:var(--err)"></div></div><span style="font-family:var(--fm);font-size:9px;color:var(--err)">40</span></div><div class="pbr"><span class="pbl">Historial</span><div class="pbar" style="flex:1"><div class="pbf" style="width:62%;background:var(--wrn)"></div></div><span style="font-family:var(--fm);font-size:9px;color:var(--wrn)">62</span></div></div><div class="pf"><span class="pid">VEN-4432</span><span class="par">›</span></div></div>
+    <div class="pc" onclick="oD('sv3')"><div class="pch"><div class="pi">❄️</div><span class="tag ti">En Revisión</span></div><div class="pn">ClimaTech Solutions</div><div class="ps">Sistemas HVAC / Chillers</div><div class="pb"><div class="pbr"><span class="pbl">Técnico</span><div class="pbar" style="flex:1"><div class="pbf" style="width:76%;background:var(--inf)"></div></div><span style="font-family:var(--fm);font-size:9px;color:var(--inf)">76</span></div><div class="pbr"><span class="pbl">Legal</span><div class="pbar" style="flex:1"><div class="pbf" style="width:88%;background:var(--inf)"></div></div><span style="font-family:var(--fm);font-size:9px;color:var(--inf)">88</span></div><div class="pbr"><span class="pbl">Historial</span><div class="pbar" style="flex:1"><div class="pbf" style="width:70%;background:var(--inf)"></div></div><span style="font-family:var(--fm);font-size:9px;color:var(--inf)">70</span></div></div><div class="pf"><span class="pid">VEN-1090</span><span class="par">›</span></div></div>
+    <div class="pc" onclick="oD('sv4')"><div class="pch"><div class="pi">🛗</div><span class="tag tg">Apto</span></div><div class="pn">LiftTech S.A.</div><div class="ps">Mantenimiento Ascensores</div><div class="pb"><div class="pbr"><span class="pbl">Técnico</span><div class="pbar" style="flex:1"><div class="pbf" style="width:95%;background:var(--p)"></div></div><span style="font-family:var(--fm);font-size:9px;color:var(--p)">95</span></div><div class="pbr"><span class="pbl">Legal</span><div class="pbar" style="flex:1"><div class="pbf" style="width:100%;background:var(--p)"></div></div><span style="font-family:var(--fm);font-size:9px;color:var(--p)">100</span></div><div class="pbr"><span class="pbl">Historial</span><div class="pbar" style="flex:1"><div class="pbf" style="width:98%;background:var(--p)"></div></div><span style="font-family:var(--fm);font-size:9px;color:var(--p)">98</span></div></div><div class="pf"><span class="pid">VEN-2104</span><span class="par">›</span></div></div>
+    <div class="pc" onclick="oD('sv5')"><div class="pch"><div class="pi">🔒</div><span class="tag tg">Apto</span></div><div class="pn">Shield Security Systems</div><div class="ps">CCTV & Control de Acceso</div><div class="pb"><div class="pbr"><span class="pbl">Técnico</span><div class="pbar" style="flex:1"><div class="pbf" style="width:90%;background:var(--p)"></div></div><span style="font-family:var(--fm);font-size:9px;color:var(--p)">90</span></div><div class="pbr"><span class="pbl">Legal</span><div class="pbar" style="flex:1"><div class="pbf" style="width:100%;background:var(--p)"></div></div><span style="font-family:var(--fm);font-size:9px;color:var(--p)">100</span></div><div class="pbr"><span class="pbl">Historial</span><div class="pbar" style="flex:1"><div class="pbf" style="width:85%;background:var(--p)"></div></div><span style="font-family:var(--fm);font-size:9px;color:var(--p)">85</span></div></div><div class="pf"><span class="pid">VEN-8871</span><span class="par">›</span></div></div>
+    <div class="pc" onclick="oD('sv6')"><div class="pch"><div class="pi">🔧</div><span class="tag tg">Apto</span></div><div class="pn">PlomaTech Servicios</div><div class="ps">Plomería & Sistemas Sanitarios</div><div class="pb"><div class="pbr"><span class="pbl">Técnico</span><div class="pbar" style="flex:1"><div class="pbf" style="width:82%;background:var(--p)"></div></div><span style="font-family:var(--fm);font-size:9px;color:var(--p)">82</span></div><div class="pbr"><span class="pbl">Legal</span><div class="pbar" style="flex:1"><div class="pbf" style="width:97%;background:var(--p)"></div></div><span style="font-family:var(--fm);font-size:9px;color:var(--p)">97</span></div><div class="pbr"><span class="pbl">Historial</span><div class="pbar" style="flex:1"><div class="pbf" style="width:80%;background:var(--p)"></div></div><span style="font-family:var(--fm);font-size:9px;color:var(--p)">80</span></div></div><div class="pf"><span class="pid">VEN-3341</span><span class="par">›</span></div></div>
+  </div>
+</div>
+
+<!-- SCREEN: PMGI -->
+<div id="s-pmgi" class="scr" style="max-width:900px">
+  <div class="sh"><div class="sh-top"><div><div class="shl">Módulo IV · PMGI</div><div class="sht">Gestión Institucional</div><div class="shs">Roles, competencias y gobernanza basada en evidencia</div></div><div class="sha"><button class="btn btp bts" onclick="oM('nrm')">+ Resolución</button></div></div></div>
+  <div class="al2 alw mb16"><div class="alt"><span class="atl" style="color:var(--wrn)">Acción Requerida</span><span class="atm">Pendiente</span></div><div class="ati">Prueba de Suficiencia Funcional — Administradora</div><div class="atd">Validar competencias mínimas INVEXA 360° antes del 15/06/2024.</div></div>
+  <div class="mb20">
+    <div style="font-family:var(--fm);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Estructura de Gobernanza</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="background:var(--bg-mid);border:1px solid rgba(78,222,163,.25);border-radius:var(--rl);padding:16px;cursor:pointer" onclick="oD('og1')">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">🏛️</span><div><div style="font-family:var(--fd);font-weight:700;font-size:15px">Asamblea de Copropietarios</div><div style="font-family:var(--fm);font-size:9px;color:var(--p);text-transform:uppercase;letter-spacing:.1em">Soberanía · Nivel Máximo</div></div></div>
+          <span class="tag tg">Activa</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6">Deliberación y aprobación exclusivamente en base probatoria técnica. Quórum mínimo: 51%. Próxima: 15/07/2024.</div>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><span class="tag tgr">42 propietarios</span><span class="tag tg">FVI: 89% completas</span></div>
+      </div>
+      <div style="background:var(--bg-mid);border:1px solid var(--out);border-radius:var(--rl);padding:16px;cursor:pointer" onclick="oD('og2')">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">👔</span><div><div style="font-family:var(--fd);font-weight:700;font-size:15px">Junta de Condominio</div><div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Dirección y Control</div></div></div>
+          <span class="tag tw">Revisión PSF</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6">3 miembros vigentes — Mandato vence DIC 2024. Supervisión de protocolos maestros y acuerdos de asamblea.</div>
+      </div>
+      <div style="background:var(--bg-mid);border:1px solid var(--out);border-radius:var(--rl);padding:16px;cursor:pointer" onclick="oD('og3')">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">⚙️</span><div><div style="font-family:var(--fd);font-weight:700;font-size:15px">Administración</div><div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Gestión Operativa</div></div></div>
+          <span class="tag tg">Operativa</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6">Inmobiliaria TCC C.A. — Valida Dualidad Probatoria, implementa SIVA y registra en PSLB cada egreso.</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><span class="ct">Resoluciones Recientes</span><button class="btn btg bts">Ver todas</button></div>
+    <div class="tw2"><table><thead><tr><th>Resolución</th><th>Fecha</th><th>Órgano</th><th>Estado</th></tr></thead><tbody>
+      <tr onclick="oD('rs1')"><td><strong>RES-2024-007</strong><br><small style="color:var(--muted)">Presupuesto mantenimiento ascensores</small></td><td style="font-family:var(--fm);font-size:11px">22 MAR 2024</td><td><span class="tag ti">Asamblea</span></td><td><span class="tag tg">Vigente</span></td></tr>
+      <tr onclick="oD('rs2')"><td><strong>RES-2024-006</strong><br><small style="color:var(--muted)">Contratación LiftTech bajo SIVA</small></td><td style="font-family:var(--fm);font-size:11px">10 FEB 2024</td><td><span class="tag tgr">Junta</span></td><td><span class="tag tg">Vigente</span></td></tr>
+      <tr onclick="oD('rs3')"><td><strong>RES-2024-003</strong><br><small style="color:var(--muted)">Convocatoria AGO extraordinaria</small></td><td style="font-family:var(--fm);font-size:11px">05 ENE 2024</td><td><span class="tag tgr">Junta</span></td><td><span class="tag tw">En Ejecución</span></td></tr>
+    </tbody></table></div>
+  </div>
+</div>
+
+<!-- SCREEN: REPORTES -->
+<div id="s-rep" class="scr" style="max-width:800px">
+  <div class="sh"><div class="sht">Reportes y Certificados</div><div class="shs">Documentos exportables del Ecosistema</div></div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="background:var(--bg-mid);border:1px solid var(--out);border-radius:var(--rl);padding:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;flex-wrap:wrap" onclick="toast('📊 Generando reporte IGVP...','i')">
+      <div style="display:flex;align-items:center;gap:12px"><span style="font-size:24px">📊</span><div><div style="font-family:var(--fd);font-weight:700;font-size:14px">Reporte IGVP Mensual</div><div style="font-size:12px;color:var(--muted)">Indicadores vulnerabilidad · Abril 2024</div></div></div>
+      <button class="btn bto bts">Descargar PDF</button>
+    </div>
+    <div style="background:var(--bg-mid);border:1px solid var(--out);border-radius:var(--rl);padding:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;flex-wrap:wrap" onclick="toast('✅ Pieza Probatoria generada','g')">
+      <div style="display:flex;align-items:center;gap:12px"><span style="font-size:24px">🔍</span><div><div style="font-family:var(--fd);font-weight:700;font-size:14px">Pieza Probatoria CLB</div><div style="font-size:12px;color:var(--muted)">Certificado Idoneidad Técnica · RIV-01-2024</div></div></div>
+      <button class="btn btp bts">Generar</button>
+    </div>
+    <div style="background:var(--bg-mid);border:1px solid var(--out);border-radius:var(--rl);padding:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;flex-wrap:wrap" onclick="toast('📖 Exportando Libro Blanco...','i')">
+      <div style="display:flex;align-items:center;gap:12px"><span style="font-size:24px">📖</span><div><div style="font-family:var(--fd);font-weight:700;font-size:14px">Extracto Libro Blanco</div><div style="font-size:12px;color:var(--muted)">Historial completo 2023–2024 · 47 nodos</div></div></div>
+      <button class="btn bto bts">Exportar</button>
+    </div>
+    <div style="background:var(--bg-mid);border:1px solid var(--out);border-radius:var(--rl);padding:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;flex-wrap:wrap" onclick="toast('🛡️ Generando certificados SIVA...','i')">
+      <div style="display:flex;align-items:center;gap:12px"><span style="font-size:24px">🛡️</span><div><div style="font-family:var(--fd);font-weight:700;font-size:14px">Certificados SIVA</div><div style="font-size:12px;color:var(--muted)">8 proveedores aptos · Vigentes 2024</div></div></div>
+      <button class="btn bto bts">Descargar ZIP</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- SCREEN: PMCO -->
+<div id="s-pmco" class="scr" style="max-width:1000px">
+  <div class="sh"><div class="sh-top"><div><div class="shl">Módulo V · PMCO</div><div class="sht">Control Operativo</div><div class="shs">Ciclo RIV-01 → SIVA → Ejecución → PSLB · Torre Corporativa Caracas</div></div><div class="sha"><button class="btn bto bts" onclick="toast('📋 Exportando plan de mantenimiento...','i')">Exportar Plan</button><button class="btn btp bts" onclick="oM('nhm')">+ OT</button></div></div></div>
+
+  <!-- KPIs operativos -->
+  <div class="kg">
+    <div class="k"><div class="kl">OTs Activas</div><div class="kv w">6</div><div class="ks">3 críticas · 2 preventivas · 1 prog.</div></div>
+    <div class="k"><div class="kl">Ciclos Completados</div><div class="kv g">28</div><div class="ks">Este año 2024</div></div>
+    <div class="k"><div class="kl">Cumplimiento Preventivo</div><div class="kv g">74%</div><div class="ks">Meta: 90%</div></div>
+    <div class="k"><div class="kl">Incidentes Q1</div><div class="kv e">2</div><div class="ks">Elevadores + CO₂</div></div>
+  </div>
+
+  <!-- Flujo PMCO -->
+  <div class="card mb16">
+    <div class="ch"><span class="ct">Flujo Operativo PMCO — Ciclo Activo</span></div>
+    <div class="cb">
+      <div style="display:flex;align-items:center;gap:0;overflow-x:auto;padding-bottom:8px">
+        <div style="flex:1;min-width:110px;padding:14px 12px;background:var(--p-dim);border:1px solid rgba(78,222,163,.3);border-radius:var(--r);text-align:center">
+          <div style="font-size:22px;margin-bottom:6px">🔍</div>
+          <div style="font-family:var(--fm);font-size:9px;color:var(--p);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Paso 1</div>
+          <div style="font-family:var(--fd);font-weight:700;font-size:12px">RIV-01</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">Inspección y registro del hallazgo</div>
+        </div>
+        <div style="font-size:18px;color:var(--muted);padding:0 8px;flex-shrink:0">→</div>
+        <div style="flex:1;min-width:110px;padding:14px 12px;background:var(--bg-mid);border:1px solid var(--out);border-radius:var(--r);text-align:center">
+          <div style="font-size:22px;margin-bottom:6px">🛡️</div>
+          <div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Paso 2</div>
+          <div style="font-family:var(--fd);font-weight:700;font-size:12px">SIVA</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">Selección proveedor certificado</div>
+        </div>
+        <div style="font-size:18px;color:var(--muted);padding:0 8px;flex-shrink:0">→</div>
+        <div style="flex:1;min-width:110px;padding:14px 12px;background:var(--bg-mid);border:1px solid var(--out);border-radius:var(--r);text-align:center">
+          <div style="font-size:22px;margin-bottom:6px">🔧</div>
+          <div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Paso 3</div>
+          <div style="font-family:var(--fd);font-weight:700;font-size:12px">Ejecución</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">OT con Dualidad Probatoria</div>
+        </div>
+        <div style="font-size:18px;color:var(--muted);padding:0 8px;flex-shrink:0">→</div>
+        <div style="flex:1;min-width:110px;padding:14px 12px;background:var(--bg-mid);border:1px solid var(--out);border-radius:var(--r);text-align:center">
+          <div style="font-size:22px;margin-bottom:6px">📖</div>
+          <div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Paso 4</div>
+          <div style="font-family:var(--fd);font-weight:700;font-size:12px">PSLB</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">Registro inmutable en Libro Blanco</div>
+        </div>
+        <div style="font-size:18px;color:var(--muted);padding:0 8px;flex-shrink:0">→</div>
+        <div style="flex:1;min-width:110px;padding:14px 12px;background:var(--bg-mid);border:1px solid rgba(78,222,163,.15);border-radius:var(--r);text-align:center">
+          <div style="font-size:22px;margin-bottom:6px">✦</div>
+          <div style="font-family:var(--fm);font-size:9px;color:var(--p);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Cierre</div>
+          <div style="font-family:var(--fd);font-weight:700;font-size:12px">Cert. IGVP</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">Actualización indicador patrimonial</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Órdenes de Trabajo -->
+  <div class="card mb16">
+    <div class="ch"><span class="ct">Órdenes de Trabajo Activas</span><button class="btn btp bts" onclick="toast('📋 Nueva OT creada','g')">+ Nueva OT</button></div>
+    <div class="tw2"><table><thead><tr><th>OT / Sistema</th><th>Tipo</th><th>Proveedor SIVA</th><th>Fecha Límite</th><th>DP</th><th>Estado</th></tr></thead><tbody>
+      <tr onclick="oD('ot1')"><td><strong>OT-2024-018</strong><br><small style="color:var(--muted);font-size:11px">Sistema de Ascensores P1</small></td><td><span class="tag te">Correctivo</span></td><td style="font-family:var(--fm);font-size:11px">LiftTech (VEN-2104)</td><td style="font-family:var(--fm);font-size:11px;color:var(--err)">01/06/2024</td><td><span class="tag te">Pendiente</span></td><td><span class="tag tw">En Proceso</span></td></tr>
+      <tr onclick="oD('ot2')"><td><strong>OT-2024-019</strong><br><small style="color:var(--muted);font-size:11px">Sistema CO₂ — Recarga</small></td><td><span class="tag te">Correctivo</span></td><td style="font-family:var(--fm);font-size:11px">Por Asignar</td><td style="font-family:var(--fm);font-size:11px;color:var(--err)">15/06/2024</td><td><span class="tag te">Pendiente</span></td><td><span class="tag te">Crítico</span></td></tr>
+      <tr onclick="oD('ot3')"><td><strong>OT-2024-015</strong><br><small style="color:var(--muted);font-size:11px">Bomba Hidroneumática</small></td><td><span class="tag tw">Preventivo</span></td><td style="font-family:var(--fm);font-size:11px">HydroFlow (VEN-9821)</td><td style="font-family:var(--fm);font-size:11px">10/06/2024</td><td><span class="tag tg">Vigente</span></td><td><span class="tag tw">Programado</span></td></tr>
+      <tr onclick="oD('ot4')"><td><strong>OT-2024-012</strong><br><small style="color:var(--muted);font-size:11px">Impermeabilización Terraza</small></td><td><span class="tag te">Correctivo</span></td><td style="font-family:var(--fm);font-size:11px">Por Evaluar SIVA</td><td style="font-family:var(--fm);font-size:11px">30/06/2024</td><td><span class="tag te">Sin DP</span></td><td><span class="tag tw">En Cotización</span></td></tr>
+      <tr onclick="oD('ot5')"><td><strong>OT-2024-009</strong><br><small style="color:var(--muted);font-size:11px">CCTV Nivel P3</small></td><td><span class="tag ti">Menor</span></td><td style="font-family:var(--fm);font-size:11px">Shield Security</td><td style="font-family:var(--fm);font-size:11px">20/05/2024</td><td><span class="tag tg">Vigente</span></td><td><span class="tag tg">Ejecutado</span></td></tr>
+    </tbody></table></div>
+  </div>
+
+  <!-- Calendario preventivo -->
+  <div class="card">
+    <div class="ch"><span class="ct">Calendario Preventivo 2024</span><span class="tag tg">Ciclo Anual</span></div>
+    <div class="cb">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px">
+        <div style="background:var(--bg-hi);border:1px solid rgba(78,222,163,.3);border-radius:var(--r);padding:12px;text-align:center;cursor:pointer" onclick="toast('📅 OCT 2024 — Planta Eléctrica programada','g')">
+          <div style="font-family:var(--fm);font-size:9px;color:var(--p);text-transform:uppercase;letter-spacing:.1em">OCT 2024</div>
+          <div style="font-size:11px;color:var(--fg);margin-top:4px;font-weight:600">Planta Eléctrica</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">Anual · Cummins</div>
+          <div class="seal mt8" style="font-size:8px;justify-content:center">Programado</div>
+        </div>
+        <div style="background:var(--bg-hi);border:1px solid rgba(78,222,163,.3);border-radius:var(--r);padding:12px;text-align:center;cursor:pointer" onclick="toast('📅 JUN 2024 — Bomba Hidroneumática','g')">
+          <div style="font-family:var(--fm);font-size:9px;color:var(--p);text-transform:uppercase;letter-spacing:.1em">JUN 2024</div>
+          <div style="font-size:11px;color:var(--fg);margin-top:4px;font-weight:600">Bomba Hidro.</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">Semestral</div>
+          <div class="seal mt8" style="font-size:8px;justify-content:center">Programado</div>
+        </div>
+        <div style="background:var(--err-dim);border:1px solid rgba(255,107,107,.3);border-radius:var(--r);padding:12px;text-align:center;cursor:pointer" onclick="toast('⚠ MAY 2024 — Ascensores VENCIDO','e')">
+          <div style="font-family:var(--fm);font-size:9px;color:var(--err);text-transform:uppercase;letter-spacing:.1em">MAY 2024</div>
+          <div style="font-size:11px;color:var(--fg);margin-top:4px;font-weight:600">Ascensores P1</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">Trimestral</div>
+          <div style="font-family:var(--fm);font-size:8px;color:var(--err);margin-top:8px;text-transform:uppercase;letter-spacing:.08em">● Vencido</div>
+        </div>
+        <div style="background:var(--err-dim);border:1px solid rgba(255,107,107,.3);border-radius:var(--r);padding:12px;text-align:center;cursor:pointer" onclick="toast('⚠ ABR 2024 — CO₂ VENCIDO','e')">
+          <div style="font-family:var(--fm);font-size:9px;color:var(--err);text-transform:uppercase;letter-spacing:.1em">ABR 2024</div>
+          <div style="font-size:11px;color:var(--fg);margin-top:4px;font-weight:600">CO₂ Extinción</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">Semestral</div>
+          <div style="font-family:var(--fm);font-size:8px;color:var(--err);margin-top:8px;text-transform:uppercase;letter-spacing:.08em">● Vencido</div>
+        </div>
+        <div style="background:var(--bg-hi);border:1px solid var(--out);border-radius:var(--r);padding:12px;text-align:center;cursor:pointer" onclick="toast('📅 DIC 2024 — CCTV programado','i')">
+          <div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">DIC 2024</div>
+          <div style="font-size:11px;color:var(--fg);margin-top:4px;font-weight:600">CCTV Sistema</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">Anual</div>
+          <div style="font-family:var(--fm);font-size:8px;color:var(--muted);margin-top:8px;text-transform:uppercase;letter-spacing:.08em">Por Confirmar</div>
+        </div>
+        <div style="background:var(--bg-hi);border:1px solid var(--out);border-radius:var(--r);padding:12px;text-align:center;cursor:pointer" onclick="oM('nhm')">
+          <div style="font-size:22px;margin-bottom:6px;opacity:.4">+</div>
+          <div style="font-size:11px;color:var(--muted);font-weight:600">Agregar</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">Nuevo evento</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: PMFGPC -->
+<div id="s-pmfgpc" class="scr" style="max-width:900px">
+  <div class="sh"><div class="sh-top"><div><div class="shl">Módulo VI · PMFGPC</div><div class="sht">Formación Patrimonial</div><div class="shs">Alfabetización Institucional · Del comunero pasivo al copropietario vigilante</div></div><div class="sha"><button class="btn btp bts" onclick="toast('🎓 Nuevo ciclo de formación iniciado','g')">+ Ciclo Formación</button></div></div></div>
+
+  <div class="three mb16">
+    <div class="k"><div class="kl">Copropietarios Formados</div><div class="kv g">31/42</div><div class="ks">74% del total</div></div>
+    <div class="k"><div class="kl">FVI Completadas</div><div class="kv g">89%</div><div class="ks">Ficha de Vida Inicial</div></div>
+    <div class="k"><div class="kl">Ciclos Activos</div><div class="kv">2</div><div class="ks">Módulos en curso</div></div>
+  </div>
+
+  <!-- Competencias -->
+  <div class="card mb16">
+    <div class="ch"><span class="ct">Mapa de Competencias Institucionales</span></div>
+    <div class="cb" style="display:flex;flex-direction:column;gap:12px">
+      <div style="background:var(--bg-hi);border:1px solid rgba(78,222,163,.25);border-radius:var(--r);padding:14px 16px;cursor:pointer" onclick="oD('comp1')">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">📋</span><div><div style="font-family:var(--fd);font-weight:700;font-size:14px">Conocimiento del Marco Legal</div><div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Competencia Obligatoria · Todos los actores</div></div></div>
+          <span style="font-family:var(--fm);font-size:13px;font-weight:800;color:var(--p)">82%</span>
+        </div>
+        <div class="pbar"><div class="pbf" style="width:82%;background:var(--p)"></div></div>
+      </div>
+      <div style="background:var(--bg-hi);border:1px solid var(--out);border-radius:var(--r);padding:14px 16px;cursor:pointer" onclick="oD('comp2')">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">🔍</span><div><div style="font-family:var(--fd);font-weight:700;font-size:14px">Lectura e Interpretación de RIV-01</div><div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Junta + Administración</div></div></div>
+          <span style="font-family:var(--fm);font-size:13px;font-weight:800;color:var(--wrn)">65%</span>
+        </div>
+        <div class="pbar"><div class="pbf" style="width:65%;background:var(--wrn)"></div></div>
+      </div>
+      <div style="background:var(--bg-hi);border:1px solid var(--out);border-radius:var(--r);padding:14px 16px;cursor:pointer" onclick="oD('comp3')">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">🛡️</span><div><div style="font-family:var(--fd);font-weight:700;font-size:14px">Protocolo SIVA — Evaluación de Proveedores</div><div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Administración + Junta</div></div></div>
+          <span style="font-family:var(--fm);font-size:13px;font-weight:800;color:var(--wrn)">58%</span>
+        </div>
+        <div class="pbar"><div class="pbf" style="width:58%;background:var(--wrn)"></div></div>
+      </div>
+      <div style="background:var(--bg-hi);border:1px solid var(--out);border-radius:var(--r);padding:14px 16px;cursor:pointer" onclick="oD('comp4')">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">⚖️</span><div><div style="font-family:var(--fd);font-weight:700;font-size:14px">Dualidad Probatoria en Egresos</div><div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Todos los actores directos</div></div></div>
+          <span style="font-family:var(--fm);font-size:13px;font-weight:800;color:var(--p)">91%</span>
+        </div>
+        <div class="pbar"><div class="pbf" style="width:91%;background:var(--p)"></div></div>
+      </div>
+      <div style="background:var(--bg-hi);border:1px solid var(--out);border-radius:var(--r);padding:14px 16px;cursor:pointer" onclick="oD('comp5')">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">📊</span><div><div style="font-family:var(--fd);font-weight:700;font-size:14px">Interpretación del IGVP</div><div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Asamblea + Junta</div></div></div>
+          <span style="font-family:var(--fm);font-size:13px;font-weight:800;color:var(--err)">44%</span>
+        </div>
+        <div class="pbar"><div class="pbf" style="width:44%;background:var(--err)"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FVI Copropietarios -->
+  <div class="card">
+    <div class="ch"><span class="ct">Fichas de Vida Inicial (FVI) — Copropietarios</span><button class="btn btp bts" onclick="toast('📋 FVI enviada al copropietario','g')">Enviar FVI</button></div>
+    <div class="tw2"><table><thead><tr><th>Unidad</th><th>Copropietario</th><th>FVI</th><th>Formación</th><th>Asamblea</th></tr></thead><tbody>
+      <tr onclick="oD('fvi1')"><td style="font-family:var(--fm);font-size:11px">P.4 - 4B</td><td><strong>García Rodríguez, M.</strong></td><td><span class="tag tg">Completa</span></td><td><span class="tag tg">Certificado</span></td><td><span class="tag tg">Activo</span></td></tr>
+      <tr onclick="oD('fvi2')"><td style="font-family:var(--fm);font-size:11px">P.7 - 7A</td><td><strong>Martínez López, C.</strong></td><td><span class="tag tw">Parcial</span></td><td><span class="tag tw">En curso</span></td><td><span class="tag tg">Activo</span></td></tr>
+      <tr onclick="oD('fvi3')"><td style="font-family:var(--fm);font-size:11px">P.12 - 12C</td><td><strong>Hernández, A. K.</strong></td><td><span class="tag te">Pendiente</span></td><td><span class="tag tgr">No iniciado</span></td><td><span class="tag tgr">Sin validar</span></td></tr>
+      <tr onclick="oD('fvi4')"><td style="font-family:var(--fm);font-size:11px">P.15 - 15A</td><td><strong>Pérez Blanco, J. L.</strong></td><td><span class="tag tg">Completa</span></td><td><span class="tag tg">Certificado</span></td><td><span class="tag tg">Activo</span></td></tr>
+      <tr onclick="oD('fvi5')"><td style="font-family:var(--fm);font-size:11px">P.18 - 18B</td><td><strong>Rodríguez, T. M.</strong></td><td><span class="tag tw">Parcial</span></td><td><span class="tag tgr">No iniciado</span></td><td><span class="tag tg">Activo</span></td></tr>
+    </tbody></table></div>
+    <div style="padding:12px 18px;border-top:1px solid var(--out);font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Mostrando 5 de 42 copropietarios · <span style="color:var(--p);cursor:pointer" onclick="toast('📋 Lista completa exportada','i')">Ver todos →</span></div>
+  </div>
+</div>
+
+<!-- SCREEN: PMAGPC -->
+<div id="s-pmagpc" class="scr" style="max-width:900px">
+  <div class="sh"><div class="sh-top"><div><div class="shl">Módulo VII · PMAGPC</div><div class="sht">Arbitraje y Gestión de Partes</div><div class="shs">Resolución institucional de controversias · Conciliación → Mediación → Arbitraje</div></div><div class="sha"><button class="btn btp bts" onclick="toast('⚖️ Nueva controversia registrada','g')">+ Caso</button></div></div></div>
+
+  <div class="three mb16">
+    <div class="k"><div class="kl">Casos Activos</div><div class="kv w">3</div><div class="ks">1 en conciliación · 2 mediación</div></div>
+    <div class="k"><div class="kl">Casos Resueltos</div><div class="kv g">12</div><div class="ks">Año 2023–2024</div></div>
+    <div class="k"><div class="kl">Tasa de Resolución</div><div class="kv g">85%</div><div class="ks">Sin llegar a arbitraje formal</div></div>
+  </div>
+
+  <!-- Escalera de Resolución -->
+  <div class="card mb16">
+    <div class="ch"><span class="ct">Protocolo de Resolución — Tres Etapas</span></div>
+    <div class="cb" style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;gap:14px;padding:16px;background:var(--p-dim);border:1px solid rgba(78,222,163,.25);border-radius:var(--r);cursor:pointer" onclick="oD('etapa1')">
+        <div style="width:36px;height:36px;background:var(--p);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:14px;color:var(--on-p);flex-shrink:0">1</div>
+        <div style="flex:1">
+          <div style="font-family:var(--fd);font-weight:700;font-size:15px;color:var(--fg);margin-bottom:4px">Conciliación Directa</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6">Las partes presentan su posición ante la Junta. Acuerdo voluntario con registro en PSLB. Plazo: 15 días.</div>
+          <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><span class="tag tg">1 caso activo</span><span class="tag tgr">Plazo: 15 días</span></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:14px;padding:16px;background:var(--wrn-dim);border:1px solid rgba(251,146,60,.25);border-radius:var(--r);cursor:pointer" onclick="oD('etapa2')">
+        <div style="width:36px;height:36px;background:var(--wrn);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:14px;color:var(--on-p);flex-shrink:0">2</div>
+        <div style="flex:1">
+          <div style="font-family:var(--fd);font-weight:700;font-size:15px;color:var(--fg);margin-bottom:4px">Mediación Arbitral Institucional</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6">Mediador neutral externo. Revisión de expediente técnico INVEXA 360°. Laudo no vinculante. Plazo: 30 días.</div>
+          <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><span class="tag tw">2 casos activos</span><span class="tag tgr">Plazo: 30 días</span></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:14px;padding:16px;background:var(--bg-mid);border:1px solid var(--out);border-radius:var(--r);cursor:pointer" onclick="oD('etapa3')">
+        <div style="width:36px;height:36px;background:var(--bg-hst);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:14px;color:var(--muted);flex-shrink:0">3</div>
+        <div style="flex:1">
+          <div style="font-family:var(--fd);font-weight:700;font-size:15px;color:var(--fg);margin-bottom:4px">Arbitraje Formal</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6">Tribunal arbitral. Laudo vinculante con valor de sentencia. Todo el expediente INVEXA 360° como prueba. Solo si fracasan etapas 1 y 2.</div>
+          <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><span class="tag tgr">0 casos activos</span><span class="tag tgr">Último recurso</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Casos -->
+  <div class="card">
+    <div class="ch"><span class="ct">Registro de Controversias — Libro Blanco</span></div>
+    <div class="tbl-wrap"><table><thead><tr><th>ID Caso</th><th>Partes</th><th>Asunto</th><th>Etapa</th><th>Inicio</th><th>Estado</th></tr></thead><tbody>
+      <tr onclick="oD('caso1')"><td style="font-family:var(--fm);font-size:11px">ARB-2024-003</td><td><strong>Unidad 8B vs. Administración</strong></td><td style="font-size:12px;color:var(--muted)">Impugnación cobro cuota extraordinaria</td><td><span class="tag tw">Mediación</span></td><td style="font-family:var(--fm);font-size:11px">10 MAR 2024</td><td><span class="tag tw">En Proceso</span></td></tr>
+      <tr onclick="oD('caso2')"><td style="font-family:var(--fm);font-size:11px">ARB-2024-002</td><td><strong>Unidad 15A vs. Junta</strong></td><td style="font-size:12px;color:var(--muted)">Disputa área común nivel 3</td><td><span class="tag tw">Mediación</span></td><td style="font-family:var(--fm);font-size:11px">22 FEB 2024</td><td><span class="tag tw">En Proceso</span></td></tr>
+      <tr onclick="oD('caso3')"><td style="font-family:var(--fm);font-size:11px">ARB-2024-001</td><td><strong>Unidad 3C vs. Proveedor</strong></td><td style="font-size:12px;color:var(--muted)">Incumplimiento contrato mantenimiento</td><td><span class="tag tg">Conciliación</span></td><td style="font-family:var(--fm);font-size:11px">05 ENE 2024</td><td><span class="tag tg">Acuerdo</span></td></tr>
+      <tr onclick="oD('caso4')"><td style="font-family:var(--fm);font-size:11px">ARB-2023-008</td><td><strong>Unidad 12B vs. Unidad 12C</strong></td><td style="font-size:12px;color:var(--muted)">Filtración entre unidades</td><td><span class="tag tgr">Cerrado</span></td><td style="font-family:var(--fm);font-size:11px">NOV 2023</td><td><span class="tag tg">Resuelto</span></td></tr>
+    </tbody></table></div>
+  </div>
+</div>
+
+</main>
+</div>
+<!-- BOTTOM NAV -->
+<nav class="bn">
+  <div class="bni">
+    <div class="bni-item active" onclick="nav('dashboard',this,'bn')"><span class="bico">📊</span><span>Dash</span></div>
+    <div class="bni-item" onclick="nav('clb',this,'bn')"><span class="bico">🔍</span><span>CLB</span><div class="bnot"></div></div>
+    <div class="bni-item" onclick="nav('libro',this,'bn')"><span class="bico">📖</span><span>Libro</span></div>
+    <div class="bni-item" onclick="nav('siva',this,'bn')"><span class="bico">🛡️</span><span>SIVA</span></div>
+    <div class="bni-item" onclick="nav('pmgi',this,'bn')"><span class="bico">🏛️</span><span>PMGI</span></div>
+    <div class="bni-item" onclick="nav('pmco',this,'bn')"><span class="bico">⚙️</span><span>PMCO</span></div>
+    <div class="bni-item" onclick="nav('pmfgpc',this,'bn')"><span class="bico">🎓</span><span>Form.</span></div>
+    <div class="bni-item" onclick="nav('pmagpc',this,'bn')"><span class="bico">⚖️</span><span>Arb.</span></div>
+  </div>
+</nav>
+</div>
+
+<!-- DRAWER -->
+<div class="dro" id="dro" onclick="cD()"></div>
+<div class="dr" id="dr">
+  <div class="drh"><span class="drt" id="drt">Detalle</span><button class="mc2" onclick="cD()">✕</button></div>
+  <div class="drb" id="drb"></div>
+  <div class="drf" id="drf"></div>
+</div>
+
+<!-- MODAL: Nuevo Hallazgo -->
+<div class="mo" id="nhm" onclick="if(event.target===this)cM('nhm')">
+  <div class="md">
+    <div class="mh"><span class="mt2">Registrar Hallazgo RIV-01</span><button class="mc2" onclick="cM('nhm')">✕</button></div>
+    <div class="mb2">
+      <div class="fg2"><label class="fl">Elemento Técnico / Activo</label><input type="text" class="fi" placeholder="Ej. Bomba de presurización piso 8"/></div>
+      <div class="fr"><div class="fg2"><label class="fl">Categoría</label><select class="fi fsel"><option>Hidráulico</option><option>Eléctrico</option><option>Elevación</option><option>Estructural</option><option>Legal</option><option>Seguridad</option></select></div><div class="fg2"><label class="fl">Nivel de Criticidad</label><select class="fi fsel"><option>Crítico</option><option>Moderado</option><option>Óptimo</option></select></div></div>
+      <div class="fr"><div class="fg2"><label class="fl">Impacto Económico (USD)</label><input type="number" class="fi" placeholder="0.00"/></div><div class="fg2"><label class="fl">Operatividad (%)</label><input type="number" class="fi" placeholder="100" min="0" max="100"/></div></div>
+      <div class="fg2"><label class="fl">Descripción del Hallazgo</label><textarea class="fi fta" placeholder="Descripción técnica detallada..."></textarea></div>
+      <div class="fg2"><label class="fl">Proveedor SIVA Asignado</label><select class="fi fsel"><option>Sin asignar</option><option>HydroFlow Systems (VEN-9821)</option><option>LiftTech S.A. (VEN-2104)</option><option>Shield Security (VEN-8871)</option></select></div>
+      <div class="fe"><button class="btn bto" onclick="cM('nhm')">Cancelar</button><button class="btn btp" onclick="cM('nhm');toast('✅ Hallazgo registrado en RIV-01','g')">Registrar Hallazgo</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Nuevo Nodo Libro Blanco -->
+<div class="mo" id="nnm" onclick="if(event.target===this)cM('nnm')">
+  <div class="md">
+    <div class="mh"><span class="mt2">Agregar Nodo al Libro Blanco</span><button class="mc2" onclick="cM('nnm')">✕</button></div>
+    <div class="mb2">
+      <div class="fr"><div class="fg2"><label class="fl">Tipo de Evento</label><select class="fi fsel"><option>Mantenimiento</option><option>Asamblea</option><option>Resolución</option><option>Contrato</option><option>Pago</option><option>Auditoría</option></select></div><div class="fg2"><label class="fl">Fecha del Evento</label><input type="date" class="fi"/></div></div>
+      <div class="fg2"><label class="fl">Título del Nodo</label><input type="text" class="fi" placeholder="Ej. Mantenimiento preventivo planta eléctrica"/></div>
+      <div class="fg2"><label class="fl">Descripción</label><textarea class="fi fta" placeholder="Descripción inmutable del evento..."></textarea></div>
+      <div class="fr"><div class="fg2"><label class="fl">Referencia / ID</label><input type="text" class="fi" placeholder="Ej. MAINT_3310"/></div><div class="fg2"><label class="fl">Monto (si aplica)</label><input type="text" class="fi" placeholder="$0.00"/></div></div>
+      <div class="fg2"><label class="fl">Documento Adjunto</label><input type="file" class="fi" style="padding:6px"/></div>
+      <div class="fe"><button class="btn bto" onclick="cM('nnm')">Cancelar</button><button class="btn btp" onclick="cM('nnm');toast('✦ Nodo registrado en Libro Blanco','g')">Guardar Nodo</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Nuevo Proveedor -->
+<div class="mo" id="npm" onclick="if(event.target===this)cM('npm')">
+  <div class="md">
+    <div class="mh"><span class="mt2">Registrar Proveedor — Filtro SIVA</span><button class="mc2" onclick="cM('npm')">✕</button></div>
+    <div class="mb2">
+      <div class="fr"><div class="fg2"><label class="fl">Razón Social</label><input type="text" class="fi" placeholder="Nombre de la empresa"/></div><div class="fg2"><label class="fl">RIF</label><input type="text" class="fi" placeholder="J-00000000-0"/></div></div>
+      <div class="fg2"><label class="fl">Especialidad / Servicio</label><select class="fi fsel"><option>Hidráulico</option><option>Eléctrico</option><option>Elevación</option><option>Estructural</option><option>HVAC</option><option>Seguridad</option><option>Plomería</option></select></div>
+      <div style="font-family:var(--fm);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">Evaluación SIVA (0–100)</div>
+      <div class="fr"><div class="fg2"><label class="fl">Capacidad Técnico-Operativa</label><input type="range" class="fi" min="0" max="100" value="50" style="padding:4px 0"/></div><div class="fg2"><label class="fl">Legalidad y Solvencia</label><input type="range" class="fi" min="0" max="100" value="50" style="padding:4px 0"/></div></div>
+      <div class="fg2"><label class="fl">Historial de Desempeño</label><input type="range" class="fi" min="0" max="100" value="50" style="padding:4px 0"/></div>
+      <div class="fg2"><label class="fl">Observaciones</label><textarea class="fi fta" placeholder="Referencias, certificaciones, notas de auditoría..."></textarea></div>
+      <div class="fe"><button class="btn bto" onclick="cM('npm')">Cancelar</button><button class="btn btp" onclick="cM('npm');toast('🛡️ Proveedor ingresado al filtro SIVA','g')">Iniciar Validación</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Nueva Resolución -->
+<div class="mo" id="nrm" onclick="if(event.target===this)cM('nrm')">
+  <div class="md">
+    <div class="mh"><span class="mt2">Nueva Resolución Fundamentada</span><button class="mc2" onclick="cM('nrm')">✕</button></div>
+    <div class="mb2">
+      <div class="al2 ali mb16"><div class="ati" style="font-size:12px">Resolución Fundamentada PMGI</div><div class="atd">Ninguna moción puede votarse sin validación técnica previa. Complete todos los campos.</div></div>
+      <div class="fr"><div class="fg2"><label class="fl">Órgano Emisor</label><select class="fi fsel"><option>Asamblea</option><option>Junta de Condominio</option><option>Administración</option></select></div><div class="fg2"><label class="fl">Fecha</label><input type="date" class="fi"/></div></div>
+      <div class="fg2"><label class="fl">Asunto de la Resolución</label><input type="text" class="fi" placeholder="Descripción clara y concisa"/></div>
+      <div class="fg2"><label class="fl">Base Técnica / Probatoria</label><textarea class="fi fta" placeholder="Hallazgos CLB, reportes SIVA o datos del Libro Blanco que fundamentan esta decisión..."></textarea></div>
+      <div class="fr"><div class="fg2"><label class="fl">Monto Involucrado</label><input type="text" class="fi" placeholder="$0.00"/></div><div class="fg2"><label class="fl">Proveedor SIVA</label><select class="fi fsel"><option>N/A</option><option>HydroFlow (VEN-9821)</option><option>LiftTech (VEN-2104)</option></select></div></div>
+      <div class="fe"><button class="btn bto" onclick="cM('nrm')">Cancelar</button><button class="btn btp" onclick="cM('nrm');toast('🏛️ Resolución registrada en PSLB','g')">Emitir Resolución</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Notificaciones -->
+<div class="mo" id="nm" onclick="if(event.target===this)cM('nm')">
+  <div class="md">
+    <div class="mh"><span class="mt2">Centro de Notificaciones</span><button class="mc2" onclick="cM('nm')">✕</button></div>
+    <div class="mb2">
+      <div class="al2 ale mb8"><div class="alt"><span class="atl" style="color:var(--err)">Crítico</span><span class="atm">2h</span></div><div class="ati">Ascensores — Mantenimiento Vencido</div></div>
+      <div class="al2 ale mb8"><div class="alt"><span class="atl" style="color:var(--err)">Crítico</span><span class="atm">3h</span></div><div class="ati">Sistema CO₂ — Falla Detectada (15%)</div></div>
+      <div class="al2 alw mb8"><div class="alt"><span class="atl" style="color:var(--wrn)">Adv.</span><span class="atm">5h</span></div><div class="ati">Póliza Incendio — Vencida</div></div>
+      <div class="al2 ali mb8"><div class="alt"><span class="atl" style="color:var(--inf)">Info</span><span class="atm">1d</span></div><div class="ati">Auditoría Semestral — Programada</div></div>
+      <div class="al2 alg"><div class="alt"><span class="atl" style="color:var(--p)">OK</span><span class="atm">2d</span></div><div class="ati">Pieza Probatoria RES-2024-007 generada</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Perfil -->
+<div class="mo" id="pm" onclick="if(event.target===this)cM('pm')">
+  <div class="md">
+    <div class="mh"><span class="mt2">Perfil y Configuración</span><button class="mc2" onclick="cM('pm')">✕</button></div>
+    <div class="mb2">
+      <div style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--bg-mid);border:1px solid var(--out);border-radius:var(--rl);margin-bottom:16px">
+        <div class="av" style="width:48px;height:48px;font-size:16px">AA</div>
+        <div><div style="font-family:var(--fd);font-weight:700;font-size:16px">Arianne Adrián Arraiz</div><div style="font-family:var(--fm);font-size:10px;color:var(--p);text-transform:uppercase;letter-spacing:.1em">Auditora Contralora · Admin</div><div class="seal mt4">✦ INVEXA 360° Certificada</div></div>
+      </div>
+      <div class="fg2"><label class="fl">Activo Contenedor Activo</label><select class="fi fsel"><option>Torre Corporativa Caracas — TCC-2024-001</option></select></div>
+      <div class="fg2"><label class="fl">Notificaciones</label><select class="fi fsel"><option>Todas (crítico + advertencias + info)</option><option>Solo críticas</option><option>Desactivadas</option></select></div>
+      <div class="fe"><button class="btn btp" onclick="cM('pm');toast('✅ Configuración guardada','g')">Guardar</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="tc" id="tc"></div>
+
+<script>
+// DRAWER DATA
+const DD = {
+  d1:{t:'TK-4402 — Ascensores Crítico',b:`<div class="tag te mb8">Crítico · Disparador Activo</div><p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px">Mantenimiento preventivo vencido hace 45 días en Torre A. Tres cabinas con 33% de operatividad combinada. Riesgo de fallo estructural inminente conforme normativa municipal.</p><div class="k mb12"><div class="kl">Impacto económico estimado</div><div class="kv e">$8,900</div></div><div class="fg2"><label class="fl">Acción correctiva</label><textarea class="fi fta" placeholder="Describe la acción tomada..."></textarea></div>`,f:`<button class="btn bto" onclick="cD()">Cerrar</button><button class="btn btp" onclick="cD();toast('✅ Ticket de emergencia creado','g')">Crear Ticket Urgente</button>`},
+  d2:{t:'SYS-0031 — CO₂ Falla Crítica',b:`<div class="tag te mb8">Crítico · 15% Operatividad</div><p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px">Sistema de extinción CO₂ operando al 15%. Cobertura en planta baja completamente comprometida. Cilindros principales vaciados, sistema de distribución con presión insuficiente.</p><div class="k mb12"><div class="kl">Impacto económico</div><div class="kv e">$4,200</div></div><div class="al2 ale"><div class="ati">Riesgo legal activo</div><div class="atd">Normativa COVENIN 823 — incumplimiento notificable a Bomberos.</div></div>`,f:`<button class="btn bto" onclick="cD()">Cerrar</button><button class="btn btp" onclick="cD();toast('🚨 Protocolo de emergencia activado','e')">Activar Protocolo</button>`},
+  d3:{t:'LG-9912 — Póliza Incendio Vencida',b:`<div class="tag tw mb8">Advertencia · Renovación Requerida</div><p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px">La póliza colectiva de incendio TCC-POL-2023 venció el 01/04/2024. Sin cobertura activa. Renovación debe tramitarse antes del 30/06/2024 o la Asamblea quedará expuesta a responsabilidad civil.</p><div class="al2 alw"><div class="ati">Aseguradora: Seguros Venezuela C.A.</div><div class="atd">Póliza N° SV-2023-88123 · Monto asegurado: $2,400,000</div></div>`,f:`<button class="btn bto" onclick="cD()">Cerrar</button><button class="btn btp" onclick="cD();toast('📋 Solicitud de renovación enviada','g')">Solicitar Renovación</button>`},
+  a1:{t:'Sistema de Ascensores P1',b:`<div class="tag te mb12">Falla Crítica · 33% Operatividad</div><div class="two mb16"><div class="k"><div class="kl">Deuda Técnica</div><div class="kv e">$8,900</div></div><div class="k"><div class="kl">Últ. Inspección</div><div class="kv" style="font-size:16px">15 FEB</div></div></div><p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:12px">Cabinas 1 y 3 fuera de servicio. Cabina 2 operativa con restricción de capacidad al 50%. Certificación OTIS pendiente de renovación. Contratista SIVA asignado: LiftTech S.A.</p><div class="al2 ale"><div class="ati">Acción requerida antes del 01/06/2024</div><div class="atd">Riesgo de sanción municipal por incumplimiento Ordenanza de Ascensores.</div></div>`,f:`<button class="btn bto" onclick="cD()">Cerrar</button><button class="btn btp" onclick="cD();toast('📋 Orden de trabajo generada','g')">Generar OT</button>`},
+  a2:{t:'Bomba Hidroneumática',b:`<div class="tag tw mb12">Preventivo · 75% Operatividad</div><div class="two mb16"><div class="k"><div class="kl">Deuda Técnica</div><div class="kv w">$3,200</div></div><div class="k"><div class="kl">Sistema</div><div class="kv" style="font-size:14px">Pisos 1–12</div></div></div><p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:12px">Proveedor: HydroFlow Systems (VEN-9821 · SIVA: APTO). Equipo Grundfos CR 32-3. Mantenimiento preventivo programado para la próxima semana. Presión estática 45 PSI — dentro de rango.</p>`,f:`<button class="btn bto" onclick="cD()">Cerrar</button><button class="btn btp" onclick="cD();toast('📅 Mantenimiento programado','g')">Programar Mant.</button>`},
+  a3:{t:'Planta Eléctrica Principal',b:`<div class="tag tg mb12">Óptimo · 100% Operatividad</div><div class="two mb16"><div class="k"><div class="kl">Deuda Técnica</div><div class="kv g">$0</div></div><div class="k"><div class="kl">Capacidad</div><div class="kv" style="font-size:16px">480KVA</div></div></div><p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:12px">Generador Cummins C480D5 en óptimas condiciones. Último mantenimiento: OCT 2023. Aceite, filtros y prueba de carga aprobados. Autonomía estimada: 72h con carga plena. Próximo mant. planificado: OCT 2024.</p><div class="seal">✦ Sello Idoneidad — Operatividad 100%</div>`,f:`<button class="btn bto" onclick="cD()">Cerrar</button><button class="btn btg bts" onclick="toast('📄 Certificado descargado','g');cD()">Descargar Cert.</button>`},
+  a4:{t:'Sistema Extinción CO₂',b:`<div class="tag te mb12">Falla Crítica · 15% Operatividad</div><div class="two mb16"><div class="k"><div class="kl">Deuda Técnica</div><div class="kv e">$4,200</div></div><div class="k"><div class="kl">Cobertura</div><div class="kv e">8 niveles</div></div></div><p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:12px">Sistema Amerex CO₂ High Pressure. Cilindros 1 a 4 vacíos. Válvulas de distribución pisos 1–4 con corrosión avanzada. Señalización de emergencia inoperativa en 3 puntos críticos.</p><div class="al2 ale"><div class="ati">Prioridad MÁXIMA</div><div class="atd">Riesgo de incumplimiento COVENIN 823 — notificar a Bomberos Caracas.</div></div>`,f:`<button class="btn bto" onclick="cD()">Cerrar</button><button class="btn btp" onclick="cD();toast('🚨 Protocolo CO₂ activado','e')">Protocolo Emergencia</button>`},
+  a5:{t:'CCTV y Control de Acceso',b:`<div class="tag tg mb12">Óptimo · 96% Operatividad</div><div class="two mb16"><div class="k"><div class="kl">Cámaras Activas</div><div class="kv g">46/48</div></div><div class="k"><div class="kl">Deuda Técnica</div><div class="kv g">$150</div></div></div><p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:12px">Sistema Hikvision DS-7732NI-I4. 2 cámaras con falla menor en nivel P3 (área de estacionamiento). Biometría de entrada 100% operativa. DVR con 30 días de almacenamiento activo. Shield Security (VEN-8871) como soporte.</p>`,f:`<button class="btn bto" onclick="cD()">Cerrar</button><button class="btn btp" onclick="cD();toast('🎥 Solicitud de reparación creada','g')">Reparar Cámaras P3</button>`},
+  sv1:{t:'HydroFlow Systems — Perfil SIVA',b:`<div style="text-align:center;padding:16px 0 20px"><div style="font-family:var(--fm);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Score SIVA</div><svg width="90" height="90" viewBox="0 0 90 90"><circle cx="45" cy="45" r="36" fill="none" stroke="#1c2a41" stroke-width="9"/><circle cx="45" cy="45" r="36" fill="none" stroke="#4edea3" stroke-width="9" stroke-dasharray="226" stroke-dashoffset="15" stroke-linecap="round" transform="rotate(-90 45 45)"/><text x="45" y="52" fill="#d6e3ff" font-family="Syne" font-size="20" font-weight="800" text-anchor="middle">93</text></svg><div class="tag tg mt8">✦ Certificado Apto</div></div><hr class="dv"><div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"><div class="pbr"><span class="pbl" style="width:120px">Técnico-Operativa</span><div class="pbar" style="flex:1"><div class="pbf" style="width:88%;background:var(--p)"></div></div><span style="font-family:var(--fm);font-size:10px;color:var(--p);width:30px;text-align:right">88</span></div><div class="pbr"><span class="pbl" style="width:120px">Legalidad</span><div class="pbar" style="flex:1"><div class="pbf" style="width:100%;background:var(--p)"></div></div><span style="font-family:var(--fm);font-size:10px;color:var(--p);width:30px;text-align:right">100</span></div><div class="pbr"><span class="pbl" style="width:120px">Historial</span><div class="pbar" style="flex:1"><div class="pbf" style="width:92%;background:var(--p)"></div></div><span style="font-family:var(--fm);font-size:10px;color:var(--p);width:30px;text-align:right">92</span></div></div><div class="k"><div class="kl">Proyectos ejecutados en INVEXA</div><div class="kv g">32</div><div class="ks">Score promedio: 4.8/5.0</div></div>`,f:`<button class="btn bto bts" onclick="cD();toast('📄 Cert. SIVA descargado','i')">Descargar PDF</button><button class="btn btp bts" onclick="cD()">Ver Auditoría</button>`},
+  sv2:{t:'ElecCorp Industrial — No Apto',b:`<div class="al2 ale mb16"><div class="ati">Proveedor NO APTO — No contratar</div><div class="atd">Score SIVA: 52/100. Incumplimientos graves en dimensión legal y técnica.</div></div><div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"><div class="pbr"><span class="pbl" style="width:120px">Técnico</span><div class="pbar" style="flex:1"><div class="pbf" style="width:55%;background:var(--err)"></div></div><span style="font-family:var(--fm);font-size:10px;color:var(--err);width:30px;text-align:right">55</span></div><div class="pbr"><span class="pbl" style="width:120px">Legal</span><div class="pbar" style="flex:1"><div class="pbf" style="width:40%;background:var(--err)"></div></div><span style="font-family:var(--fm);font-size:10px;color:var(--err);width:30px;text-align:right">40</span></div><div class="pbr"><span class="pbl" style="width:120px">Historial</span><div class="pbar" style="flex:1"><div class="pbf" style="width:62%;background:var(--wrn)"></div></div><span style="font-family:var(--fm);font-size:10px;color:var(--wrn);width:30px;text-align:right">62</span></div></div><p style="font-size:12px;color:var(--muted);line-height:1.6">Causas de descalificación: RIF vencido, solvencia SENIAT no presentada, incumplimiento de contrato previo en 2022 con otro inmueble bajo protocolo.</p>`,f:`<button class="btn bto" onclick="cD()">Cerrar</button><button class="btn" style="background:var(--err-dim);border:1px solid rgba(255,107,107,.3);color:var(--err)" onclick="cD();toast('🚫 Proveedor bloqueado en el sistema','e')">Bloquear Definitivamente</button>`},
+  l1:{t:'Nodo: Asamblea General 2024',b:`<div class="seal mb12">✦ Verificado — Inimpugnable</div><div class="k mb12"><div class="kl">Documento</div><div class="kv" style="font-size:13px;font-family:var(--fm)">ACTA_AGO_772.PDF</div></div><p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:12px">Validación anual de estados financieros 2023 y aprobación del plan de inversión 2024–2025 por Bs.S 85,000.00. Quórum 78% (33/42 propietarios). Votación unánime en todos los puntos.</p><div class="al2 alg"><div class="ati">Integridad confirmada</div><div class="atd">SHA-256: a3f9c1d8e2b4f7a9… · 22/03/2024 10:14:32</div></div>`,f:`<button class="btn bto" onclick="cD()">Cerrar</button><button class="btn btp" onclick="toast('📄 Nodo exportado','i');cD()">Exportar Nodo</button>`},
+  l4:{t:'Nodo: Certificación CLB',b:`<div class="seal mb12">✦ Verificado — Registro de Origen</div><div class="k mb12"><div class="kl">IGVP al Momento</div><div class="kv w">48%</div><div class="ks">Moderado · Fecha: 12 ENE 2024</div></div><p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:12px">Primera fijación de la línea base estructural, financiera y legal bajo metodología INVEXA 360°. Total de 14 hallazgos registrados en este Estado Cero. Documento maestro del activo.</p>`,f:`<button class="btn bto" onclick="cD()">Cerrar</button><button class="btn btp" onclick="toast('📄 CLB descargado','g');cD()">Descargar CLB</button>`},
+  og1:{t:'Asamblea de Copropietarios',b:`<div class="tag tg mb12">Soberanía · Nivel Máximo</div><p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px">Máxima instancia decisoria del inmueble. Deliberación y aprobación basada exclusivamente en base probatoria técnica. Ninguna moción puede votarse sin validación previa.</p><div class="three mb16"><div class="k"><div class="kl">Propietarios</div><div class="kv">42</div></div><div class="k"><div class="kl">FVI Completas</div><div class="kv g">89%</div></div><div class="k"><div class="kl">Próx. AGO</div><div class="kv" style="font-size:14px">15/07</div></div></div><div class="al2 ali"><div class="ati">Convocatoria en preparación</div><div class="atd">Agenda: revisión IGVP + aprobación presupuesto reparación CO₂ + renovación póliza</div></div>`,f:`<button class="btn bto" onclick="cD()">Cerrar</button><button class="btn btp" onclick="cD();oM('nrm')">Nueva Resolución</button>`},
+  rc1:{t:'Hallazgo: Ascensores P1 — Crítico',b:`<div class="tag te mb12">Criticidad: Máxima</div><div class="three mb16"><div class="k"><div class="kl">Impacto</div><div class="kv e">$8,900</div></div><div class="k"><div class="kl">Operatividad</div><div class="kv e">33%</div></div><div class="k"><div class="kl">Custodia</div><div class="kv g" style="font-size:14px">Vigente</div></div></div><p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:12px">Sistema de ascensores con mantenimiento preventivo vencido. Cabinas 1 y 3 fuera de servicio. Proveedor SIVA asignado: LiftTech S.A. (VEN-2104). Resolución respaldante: RES-2024-006.</p><div class="al2 ale"><div class="ati">Recomendación CLB</div><div class="atd">Contratar intervención correctiva urgente antes del 01/06/2024 o IGVP escala a Avanzado.</div></div>`,f:`<button class="btn bto" onclick="cD()">Cerrar</button><button class="btn btp" onclick="cD();toast('📋 OT generada para LiftTech','g')">Emitir OT</button>`},
+  rs1:{t:'RES-2024-007 — Vigente',b:`<div class="tag tg mb12">Resolución Vigente</div><div class="k mb12"><div class="kl">Asunto</div><div class="kv" style="font-size:14px;line-height:1.3">Aprobación Presupuesto Mantenimiento Ascensores</div></div><div class="fr mb16"><div class="k"><div class="kl">Fecha</div><div class="kv" style="font-size:14px">22/03/2024</div></div><div class="k"><div class="kl">Órgano</div><div class="kv" style="font-size:14px">Asamblea</div></div></div><p style="font-size:13px;color:var(--muted);line-height:1.7">Base probatoria: Expediente RIV-01-2024, Hallazgo TK-4402. Monto aprobado: $12,800. Proveedor: LiftTech S.A. Dualidad Probatoria: Factura SENIAT + Aval Técnico SIVA requeridos al cierre.</p>`,f:`<button class="btn bto" onclick="cD()">Cerrar</button><button class="btn btp" onclick="cD();toast('📄 Resolución exportada al PSLB','g')">Exportar PSLB</button>`},
+  ot1:{t:'OT-2024-018 — Ascensores P1',b:`<div class="tag te mb12">Correctivo Crítico</div><div class="fr mb16"><div class="k"><div class="kl">Sistema</div><div class="kv" style="font-size:14px">Ascensores P1</div></div><div class="k"><div class="kl">Fecha límite</div><div class="kv e" style="font-size:14px">01/06/2024</div></div></div><p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:12px">Sustitución de motores de tracción cabinas 1 y 3. Proveedor asignado: LiftTech S.A. (SIVA APTO). Presupuesto aprobado: $12,800. <strong style="color:var(--err)">Dualidad Probatoria pendiente de validar.</strong></p><div class="al2 ale"><div class="ati">Acción requerida</div><div class="atd">Confirmar Factura SENIAT + Aval Técnico antes de cerrar la OT en PSLB.</div></div>`,f:`<button class="btn bto" onclick="cD()">Cerrar</button><button class="btn btp" onclick="cD();toast('✅ OT cerrada con Dualidad Probatoria','g')">Cerrar OT + PSLB</button>`},
+  ot2:{t:'OT-2024-019 — CO₂ Recarga',b:`<div class="tag te mb12">Correctivo Crítico · Proveedor no asignado</div><p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:12px">Recarga de cilindros CO₂ y revisión del sistema de distribución en planta baja. No hay proveedor SIVA disponible para esta especialidad. Requiere incorporar uno al directorio antes de proceder.</p><div class="al2 ale"><div class="ati">Alerta SIVA</div><div class="atd">Ningún contratista de sistemas CO₂ certificado actualmente. Iniciar proceso de validación urgente.</div></div>`,f:`<button class="btn bto" onclick="cD()">Cerrar</button><button class="btn btp" onclick="cD();nav('siva',document.querySelectorAll('.ni')[3])">Ir a SIVA →</button>`},
+  caso1:{t:'ARB-2024-003 — Mediación',b:`<div class="tag tw mb12">Etapa 2 · Mediación Arbitral</div><div class="fr mb16"><div class="k"><div class="kl">Actor A</div><div class="kv" style="font-size:13px">Unidad 8B</div></div><div class="k"><div class="kl">Actor B</div><div class="kv" style="font-size:13px">Administración</div></div></div><p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:12px">Impugnación del cobro de cuota extraordinaria aprobada en AGO de MAR 2024. El copropietario alega que el monto no fue suficientemente fundamentado técnicamente en la convocatoria.</p><p style="font-size:13px;color:var(--muted);line-height:1.7">Base probatoria disponible: Acta AGO MAR 2024 (PSLB) + Expediente RIV-01-2024 + Resolución RES-2024-007.</p>`,f:`<button class="btn bto" onclick="cD()">Cerrar</button><button class="btn btp" onclick="cD();toast('📋 Expediente enviado al mediador','g')">Enviar Expediente</button>`},
+  etapa1:{t:'Etapa 1 — Conciliación Directa',b:`<div class="tag tg mb12">Etapa Activa · 1 caso</div><p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:12px">Las partes en controversia presentan su posición ante la Junta de Condominio como órgano conciliador. Se busca un acuerdo voluntario sin intervención externa.</p><div class="k mb12"><div class="kl">Plazo máximo</div><div class="kv g" style="font-size:18px">15 días</div></div><p style="font-size:12px;color:var(--muted)">Si no hay acuerdo, el caso escala automáticamente a Mediación Arbitral. Todo queda registrado en el PSLB.</p>`,f:`<button class="btn bto" onclick="cD()">Cerrar</button><button class="btn btp" onclick="cD();toast('📋 Convocatoria de conciliación enviada','g')">Convocar Partes</button>`},
+};
+
+// NAVIGATION
+function nav(id, el, t) {
+  document.querySelectorAll('.scr').forEach(s => s.classList.remove('active'));
+  const scr = document.getElementById('s-' + id);
+  if (scr) scr.classList.add('active');
+  document.getElementById('mc').scrollTop = 0;
+  if (t === 'bn') {
+    document.querySelectorAll('.bni-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+    const map = {dashboard:0,clb:1,libro:2,siva:3,pmgi:4,pmco:5,pmfgpc:6,pmagpc:7};
+    document.querySelectorAll('.ni').forEach(i => i.classList.remove('active'));
+    const idx = Object.keys(map).indexOf(id);
+    const nis = document.querySelectorAll('.ni');
+    if (idx >= 0 && nis[idx]) nis[idx].classList.add('active');
+  } else if (el) {
+    document.querySelectorAll('.ni').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+    const map2 = {dashboard:0,clb:1,libro:2,siva:3,pmgi:4,pmco:5,pmfgpc:6,pmagpc:7};
+    document.querySelectorAll('.bni-item').forEach(i => i.classList.remove('active'));
+    const idx2 = Object.keys(map2).indexOf(id);
+    const bns = document.querySelectorAll('.bni-item');
+    if (idx2 >= 0 && bns[idx2]) bns[idx2].classList.add('active');
+  }
+}
+
+// MODALS
+function oM(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow = 'hidden'; }
+function cM(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow = ''; }
+
+// DRAWER
+function oD(key) {
+  const d = DD[key] || { t:'Detalle', b:`<p style="font-size:13px;color:var(--muted)">En producción, aquí se cargarán los datos reales desde el backend.</p>`, f:`<button class="btn bto" onclick="cD()">Cerrar</button>` };
+  document.getElementById('drt').textContent = d.t;
+  document.getElementById('drb').innerHTML = d.b;
+  document.getElementById('drf').innerHTML = d.f;
+  document.getElementById('dr').classList.add('open');
+  document.getElementById('dro').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function cD() {
+  document.getElementById('dr').classList.remove('open');
+  document.getElementById('dro').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// TOAST
+function toast(msg, type) {
+  const col = { g: 'var(--p)', w: 'var(--wrn)', e: 'var(--err)', i: 'var(--inf)' };
+  const ico = { g: '✦', w: '⚠', e: '✕', i: 'ℹ' };
+  const c = document.getElementById('tc');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = `<span style="color:${col[type]||col.i};font-size:18px">${ico[type]||ico.i}</span><span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(() => { t.classList.add('rm'); setTimeout(() => t.remove(), 300); }, 3200);
+}
+
+// FILTER RIV
+function fRIV(n, chip) {
+  chip.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  document.querySelectorAll('.rr').forEach(r => { r.style.display = (n === 't' || r.dataset.n === n) ? '' : 'none'; });
+}
+
+// FILTER TIMELINE
+function fTL(val) {
+  document.querySelectorAll('.tln').forEach(n => { n.style.display = n.textContent.toLowerCase().includes(val.toLowerCase()) ? '' : 'none'; });
+}
+
+// FILTER PROVIDERS
+function fPR(val) {
+  document.querySelectorAll('.pc').forEach(p => { p.style.display = p.textContent.toLowerCase().includes(val.toLowerCase()) ? '' : 'none'; });
+}
+
+// PWA SERVICE WORKER
+if ('serviceWorker' in navigator) {
+  const swCode = `self.addEventListener('install',()=>self.skipWaiting());self.addEventListener('activate',()=>clients.claim());self.addEventListener('fetch',e=>e.respondWith(fetch(e.request).catch(()=>new Response('Offline',{status:503}))));`;
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+}
+
+// PWA MANIFEST
+const mf = { name:'INVEXA 360°', short_name:'INVEXA', description:'Ecosistema de Gestión Patrimonial', start_url:'.', display:'standalone', background_color:'#041329', theme_color:'#041329', orientation:'any', icons:[{src:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' fill='%23041329'/><text y='128' x='28' font-size='110' font-family='serif' fill='%234edea3'>IX</text></svg>",sizes:'192x192',type:'image/svg+xml'}] };
+const ml = document.createElement('link');
+ml.rel = 'manifest'; ml.href = URL.createObjectURL(new Blob([JSON.stringify(mf)], {type:'application/json'}));
+document.head.appendChild(ml);
+
+// Chip filter click - chip rows in filter sections
+document.querySelectorAll('.fr2 .chip').forEach(chip => {
+  if (!chip.getAttribute('onclick')) {
+    chip.addEventListener('click', function() {
+      this.closest('.fr2').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+    });
+  }
+});
+
+// Welcome toast
+setTimeout(() => toast('Torre Corporativa Caracas · IGVP 45% Moderado', 'w'), 900);
+</script>
+</body>
+</html>
